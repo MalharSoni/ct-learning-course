@@ -12,14 +12,13 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('light');
+  const [theme, setTheme] = useState<Theme>('dark');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     const stored = localStorage.getItem('theme') as Theme | null;
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialTheme = stored || (prefersDark ? 'dark' : 'light');
+    const initialTheme = stored || 'dark'; // Default to dark mode
     setTheme(initialTheme);
     document.documentElement.classList.toggle('dark', initialTheme === 'dark');
   }, []);
