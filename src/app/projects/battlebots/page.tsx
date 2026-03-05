@@ -3,7 +3,7 @@ import { Topbar } from '@/components/layout/topbar';
 import { ContentWrapper } from '@/components/layout/content-wrapper';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, CheckCircle2, Target, Wrench, Code, Trophy, AlertCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Target, Wrench, Code, Trophy, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
 export default function BattleBotsProjectPage() {
@@ -12,28 +12,30 @@ export default function BattleBotsProjectPage() {
       <Sidebar />
       <Topbar title="BattleBots Project" />
       <ContentWrapper>
-        <div className="space-y-8">
+        <div className="space-y-12">
           {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Link href="/" className="hover:text-foreground">Home</Link>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium animate-in fade-in slide-in-from-top-2 duration-500">
+            <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
             <span>/</span>
-            <Link href="/projects" className="hover:text-foreground">Projects</Link>
+            <Link href="/projects" className="hover:text-foreground transition-colors">Projects</Link>
             <span>/</span>
-            <span className="text-foreground font-medium">BattleBots</span>
+            <span className="text-foreground font-semibold">BattleBots</span>
           </div>
 
           {/* Hero */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <span className="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide bg-amber-100 text-amber-800">
+          <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="inline-flex items-center rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-wide bg-amber-100 dark:bg-amber-950/30 text-amber-800 dark:text-amber-400 shadow-sm">
                 Intermediate
               </span>
-              <span className="text-[13px] text-muted-foreground">⏱️ 4-6 weeks</span>
+              <span className="text-[14px] text-muted-foreground font-semibold flex items-center gap-1.5">
+                <span className="text-amber-500">⏱️</span> 4-6 weeks
+              </span>
             </div>
-            <h1 className="text-[36px] font-black tracking-tight">
+            <h1 className="text-[44px] font-black tracking-tighter leading-[1.1] bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
               BattleBots Combat Robot
             </h1>
-            <p className="text-[16px] text-muted-foreground leading-relaxed max-w-3xl">
+            <p className="text-[17px] text-muted-foreground leading-relaxed max-w-3xl font-medium">
               Design, build, and compete with your own combat robot. Learn weapon systems, defensive
               strategies, armor design, and competition tactics while combining V5 parts with
               3D-printed custom components.
@@ -41,53 +43,72 @@ export default function BattleBotsProjectPage() {
           </div>
 
           {/* Prerequisites */}
-          <Card className="border-l-4 border-l-blue-500">
+          <Card className="border-l-4 border-l-blue-500 bg-blue-50/50 dark:bg-blue-950/20 hover:shadow-md transition-all duration-300 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target size={20} />
+              <CardTitle className="flex items-center gap-3 text-[20px] text-blue-700 dark:text-blue-400">
+                <div className="h-10 w-10 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center">
+                  <Target size={20} />
+                </div>
                 Prerequisites
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-[14px] text-muted-foreground mb-3">
+              <p className="text-[15px] text-muted-foreground font-medium mb-4">
                 Before starting this project, you should complete:
               </p>
-              <ul className="space-y-2">
-                <li className="flex gap-2 text-[14px]">
-                  <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5" />
-                  <Link href="/course/v5-building" className="hover:underline">V5 Building Fundamentals</Link>
+              <ul className="space-y-3">
+                <li className="flex gap-3 text-[15px] group">
+                  <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 shrink-0 group-hover:scale-110 transition-transform" />
+                  <Link href="/course/v5-building" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium hover:underline underline-offset-2">
+                    V5 Building Fundamentals
+                  </Link>
                 </li>
-                <li className="flex gap-2 text-[14px]">
-                  <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5" />
-                  <Link href="/course/v5-cad" className="hover:underline">Basic CAD (Onshape)</Link>
+                <li className="flex gap-3 text-[15px] group">
+                  <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 shrink-0 group-hover:scale-110 transition-transform" />
+                  <Link href="/course/v5-cad" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium hover:underline underline-offset-2">
+                    Basic CAD (Onshape)
+                  </Link>
                 </li>
-                <li className="flex gap-2 text-[14px]">
-                  <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5" />
-                  <Link href="/course/v5-code" className="hover:underline">Driver Control Programming</Link>
+                <li className="flex gap-3 text-[15px] group">
+                  <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 shrink-0 group-hover:scale-110 transition-transform" />
+                  <Link href="/course/v5-code" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium hover:underline underline-offset-2">
+                    Driver Control Programming
+                  </Link>
                 </li>
               </ul>
             </CardContent>
           </Card>
 
           {/* Skills You&apos;ll Learn */}
-          <section>
-            <h2 className="text-[26px] font-bold mb-4 flex items-center gap-2">
-              <Trophy className="h-6 w-6 text-primary" />
-              Skills You&apos;ll Learn
-            </h2>
+          <section className="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Trophy className="h-5 w-5 text-primary" />
+              </div>
+              <h2 className="text-[28px] font-black tracking-tight">Skills You&apos;ll Learn</h2>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[
-                { title: 'Combat Robot Design', desc: 'Weight distribution, weapon placement, defensive geometry' },
-                { title: 'Weapon Systems', desc: 'Spinning weapons, flippers, lifters, and hammers' },
-                { title: 'Armor Design', desc: 'Material selection, 3D printing protective shells' },
-                { title: 'Strategy & Tactics', desc: 'Match analysis, opponent weaknesses, driving techniques' },
-                { title: '3D Printing Integration', desc: 'Custom parts, armor plates, weapon components' },
-                { title: 'Competition Readiness', desc: 'Reliability testing, quick repairs, pit protocols' },
-              ].map((skill) => (
-                <Card key={skill.title}>
-                  <CardHeader>
-                    <CardTitle className="text-[15px]">{skill.title}</CardTitle>
-                    <CardDescription className="text-[13px]">{skill.desc}</CardDescription>
+                { title: 'Combat Robot Design', desc: 'Weight distribution, weapon placement, defensive geometry', icon: '⚙️' },
+                { title: 'Weapon Systems', desc: 'Spinning weapons, flippers, lifters, and hammers', icon: '⚔️' },
+                { title: 'Armor Design', desc: 'Material selection, 3D printing protective shells', icon: '🛡️' },
+                { title: 'Strategy & Tactics', desc: 'Match analysis, opponent weaknesses, driving techniques', icon: '🎯' },
+                { title: '3D Printing Integration', desc: 'Custom parts, armor plates, weapon components', icon: '🖨️' },
+                { title: 'Competition Readiness', desc: 'Reliability testing, quick repairs, pit protocols', icon: '🏆' },
+              ].map((skill, idx) => (
+                <Card
+                  key={skill.title}
+                  className="hover:shadow-md hover:border-accent/50 transition-all duration-300 group"
+                  style={{ animationDelay: `${idx * 50}ms` }}
+                >
+                  <CardHeader className="space-y-2">
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl group-hover:scale-110 transition-transform">{skill.icon}</span>
+                      <div className="space-y-1">
+                        <CardTitle className="text-[16px] group-hover:text-accent transition-colors">{skill.title}</CardTitle>
+                        <CardDescription className="text-[14px]">{skill.desc}</CardDescription>
+                      </div>
+                    </div>
                   </CardHeader>
                 </Card>
               ))}
@@ -95,9 +116,14 @@ export default function BattleBotsProjectPage() {
           </section>
 
           {/* Project Phases */}
-          <section>
-            <h2 className="text-[26px] font-bold mb-4">Project Phases</h2>
-            <div className="space-y-4">
+          <section className="space-y-6 animate-in fade-in slide-in-from-bottom-10 duration-700 delay-500">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Code className="h-5 w-5 text-primary" />
+              </div>
+              <h2 className="text-[28px] font-black tracking-tight">Project Phases</h2>
+            </div>
+            <div className="space-y-5">
               {/* Phase 1 */}
               <Card className="border-l-4 border-l-green-500">
                 <CardHeader>
@@ -372,16 +398,26 @@ export default function BattleBotsProjectPage() {
           </Card>
 
           {/* Navigation */}
-          <div className="flex items-center justify-between pt-8 border-t border-border">
-            <Button variant="outline" asChild>
+          <div className="flex items-center justify-between pt-12 mt-8 border-t border-border/50 animate-in fade-in duration-700 delay-700">
+            <Button
+              variant="outline"
+              asChild
+              size="lg"
+              className="hover:bg-accent hover:text-accent-foreground transition-all duration-200 hover:scale-105 active:scale-95 font-semibold"
+            >
               <Link href="/projects">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 All Projects
               </Link>
             </Button>
-            <Button asChild>
+            <Button
+              asChild
+              size="lg"
+              className="font-semibold shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 active:scale-95"
+            >
               <Link href="/projects/line-follower">
                 Next Project: Line Follower
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
           </div>
