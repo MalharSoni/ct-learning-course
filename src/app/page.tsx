@@ -13,24 +13,59 @@ export default function HomePage() {
       <Sidebar />
       <Topbar title="Caution Tape Robotics - Learning Course" />
       <ContentWrapper>
-        <div className="space-y-16">
-          {/* Hero Section */}
-          <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-1.5 text-sm font-semibold text-accent-foreground border border-accent/20">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
-              </span>
-              VEX V5 Robotics & STEM Education
+        <div className="space-y-24">
+          {/* Hero Section - Supabase Style */}
+          <div className="relative -mt-8 -mx-8 px-8 pt-16 pb-20 overflow-hidden">
+            {/* Gradient Background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-background to-background" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(62,207,142,0.1),transparent_50%)]" />
+            <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:50px_50px]" />
+
+            <div className="relative space-y-8 text-center max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
+              <div className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-1.5 text-sm font-semibold text-accent border border-accent/20">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
+                </span>
+                VEX V5 Robotics & STEM Education
+              </div>
+
+              <h1 className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter leading-[1.05]">
+                Build Your Future with{' '}
+                <span className="bg-gradient-to-r from-accent via-accent to-accent/70 bg-clip-text text-transparent">
+                  Robotics
+                </span>
+              </h1>
+
+              <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+                A comprehensive STEM learning platform for high school students. Master VEX V5 robotics,
+                CAD design, programming, and build portfolio projects that matter.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                <Button
+                  asChild
+                  size="lg"
+                  className="font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 text-base px-8"
+                >
+                  <Link href="/course/getting-started">
+                    Start Learning
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  asChild
+                  size="lg"
+                  className="font-semibold transition-all duration-200 hover:scale-105 active:scale-95 text-base px-8"
+                >
+                  <Link href="/projects">
+                    Explore Projects
+                    <Wrench className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+              </div>
             </div>
-            <h1 className="text-[42px] font-black tracking-tighter leading-[1.1] bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
-              Welcome to CT Learning Course
-            </h1>
-            <p className="text-[17px] text-muted-foreground leading-relaxed max-w-3xl font-medium">
-              A comprehensive STEM learning platform designed for high school students (grades 9-12).
-              Master VEX V5 robotics, CAD design, programming, and work on exciting hands-on projects
-              that build your technical portfolio.
-            </p>
           </div>
 
           {/* Key Features */}
