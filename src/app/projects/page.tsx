@@ -3,7 +3,7 @@ import { Topbar } from '@/components/layout/topbar';
 import { ContentWrapper } from '@/components/layout/content-wrapper';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Target, Clock } from 'lucide-react';
+import { ArrowRight, Target, Clock, Wrench } from 'lucide-react';
 import Link from 'next/link';
 import { projects } from '@/lib/curriculum-data';
 
