@@ -15,7 +15,7 @@ Marking guidance for short answers: award partial credit where indicated. Accept
 | 1.3 | **C** | 6 wheels: more traction, more complex, more friction |
 | 1.4 | **B** | Drop center: middle wheels carry traction, outer wheels are low-friction followers |
 | 1.5 | **B** | All-traction = high friction, push-resistant, less mobile (wheel rub also overheats motors faster) |
-| 1.6 | **C** | Live shafts connect two rotating objects (motor→wheel); they require bearings to spin freely |
+| 1.6 | **C** | Live shafts connect two rotating objects (motor→wheel) |
 | 1.7 | **A** | Overheating motors (hotswap/compressed air), loosening screws (Loctite), shaft collar creep |
 | 1.8 | **B** | "Friction. The biggest enemy of all." |
 
@@ -32,57 +32,61 @@ Any two causes (2 pts each), e.g.:
 - One motor weaker/overheating
 
 Any one diagnostic test (1 pt), e.g.:
-- Rolling-straight test (push the unpowered robot and watch drift)
+- Rolling-straight push test (push the unpowered robot and watch drift)
 - Free-spin test on each wheel to compare friction
 - Swap/compare motor sides
 
 ---
 
-## Section 2 — Unit 2: Programming Foundations
+## Section 2 — Unit 1: Common Parts, Tools & Fabrication
 
 | Q | Answer | Notes |
 |---|--------|-------|
-| 2.1 | **B** | A class is a blueprint defining variables (data) and methods (behavior) |
-| 2.2 | **B** | Encapsulation = bundling data + methods, hiding internals |
-| 2.3 | **B** | Controller input or autonomous triggers cause state transitions |
-| 2.4 | **B** | Command classes encapsulate one action for reuse and organization |
-| 2.5 | **B** | Console prints to confirm state transitions |
-| 2.6 | **A** | `if state == LIFTING → move motor` is the taught transition logic |
-| 2.7 | **B** | Limit switch stopping the lift = sensor feedback integration |
-| 2.8 | **B** | VEXcode V5 Text (C++) |
+| 2.1 | **B** | Spacers/washers fill space along the shaft or screw so components stay put without metal-on-metal rub |
+| 2.2 | **B** | Boxing: standoffs tie parallel channels/plates into a rigid box that resists twisting |
+| 2.3 | **B** | Screw joint = pivot around a stationary screw; usable where no live shaft is needed; doubles as a crossmember |
+| 2.4 | **B** | No bearing needed at the motor — it supports the shaft internally; extra bearings = extra friction |
+| 2.5 | **B** | Red = 100 RPM, Green = 200 RPM, Blue = 600 RPM |
+| 2.6 | **B** | 11W: swappable 100/200/600 RPM cartridges; 5.5W: fixed 200 RPM |
+| 2.7 | **B** | Nested channels reinforce each other — no crushing in the vice, straight and square cut |
+| 2.8 | **B** | Filing smooths the cut edge, removes burrs, fine-tunes final size |
 
-**2.9** *(4 pts — 2 for states, 2 for definition)*
-- States: **IDLE, LIFTING, PLACING** (2 pts; all three needed for full marks, 1 pt for two)
-- State machine: a program structure where the robot is always in exactly one defined state, and moves between states when conditions/inputs trigger a transition; behavior depends on the current state (2 pts)
+**2.9** *(4 pts — 1 pt per step)*
+Sample full-credit process:
+1. Measure and mark the cut line (1 pt)
+2. Couple/nest a second C-channel with the one being cut for rigidity (1 pt)
+3. Clamp the pair securely in the vice close to the cut line and cut with steady full strokes (1 pt)
+4. File the cut edge smooth to remove burrs and reach final size (1 pt)
 
-**2.10** *(5 pts — 3 for sequence, 2 for sensor)*
-Sample sequence (3 pts): start in IDLE → transition to an intake/grab state when the routine begins → LIFTING (raise lift to target height) → PLACING (release object) → return to IDLE. Accept any coherent ordering that shows discrete states with triggered transitions.
-Sensor (2 pts), e.g.: limit switch to stop the lift at exact height; bumper/distance sensor to confirm object is captured before lifting; encoder feedback to verify lift position.
+**2.10** *(5 pts — 2 + 2 + 1)*
+- Bearings ARE needed where the shaft passes through each C-channel wall (both walls), so the live shaft spins smoothly (2 pts)
+- A bearing is NOT needed at the motor — the motor supports the shaft internally (2 pts)
+- More bearings than required just add unnecessary friction (1 pt)
 
 ---
 
-## Section 3 — Unit 3: CAD and Machining
+## Section 3 — Unit 3: CAD & 3D Printing
 
 | Q | Answer | Notes |
 |---|--------|-------|
-| 3.1 | **C** | Onshape |
-| 3.2 | **B** | Precision, collaboration, iteration, documentation |
-| 3.3 | **B** | Model in Parts Studios, mate in Assemblies |
-| 3.4 | **A** | MKCAD (plus CautionTape-specific libraries) |
-| 3.5 | **C** | DXF export for CNC cutting |
-| 3.6 | **B** | Center punch, then pilot hole for accuracy |
-| 3.7 | **A** | Removing sharp leftover material (burrs) from holes/edges |
-| 3.8 | **C** | Diagnose via CAD, adjust tolerances/hole placement, re-machine if needed |
+| 3.1 | **B** | Model in Parts Studios, mate in Assemblies |
+| 3.2 | **B** | Mate connector = point with position + orientation where mates attach |
+| 3.3 | **B** | Fastened = rigid, zero degrees of freedom |
+| 3.4 | **B** | Revolute = one rotational degree of freedom about a single axis |
+| 3.5 | **B** | Wheel spins → revolute; screwed structure → fastened |
+| 3.6 | **A** | MKCAD (plus CautionTape-specific libraries) |
+| 3.7 | **C** | STL is the 3D printing export format |
+| 3.8 | **B** | Slicer converts the model to layer-by-layer G-code using layer height, infill, supports, etc. |
+| 3.9 | **B** | Past ~45° each layer overhangs too far and droops without supports |
+| 3.10 | **A** | Lower infill = lighter/faster/cheaper but weaker |
 
-**3.9** *(4 pts — 2 per tool: 1 for naming, 1 for use)* Any two of:
-- Drill press / drill bits (twist, step bit): making accurate holes; clamp work, correct speed
-- Files (flat, round, half-round): smoothing edges, precise dimensioning, deburring holes
-- Belt sander: cleaning aluminum edges to professional finish, sneaking up on accurate part size
-- Center punch: marking hole locations so the bit doesn't wander
-
-**3.10** *(5 pts — 3 for definition/why, 2 for example)*
-- Tolerance = the allowable variation between the designed dimension and the real part; matters because parts must physically fit — holes must clear screws/shafts, and CNC/drilling isn't perfectly exact (3 pts)
-- Example (2 pts), e.g.: making a shaft hole slightly oversized so the shaft spins freely; sizing screw holes for clearance vs. thread engagement; leaving alignment-hole spacing to match VEX 0.5" hole pitch
+**3.11** *(5 pts — 3 for part a, 2 for part b)*
+(a) Revolute mates at each of the four pivots (each linkage joint rotates about one axis); fastened mates for the screwed structural joints (rigid, zero degrees of freedom) (3 pts — 1 pt each for revolute, fastened, and correct reasoning)
+(b) Any two (1 pt each):
+- Orient the print so layer lines run perpendicular to the load (parts split along layer lines)
+- Avoid overhangs past 45°, or add supports/chamfer them away
+- Raise infill percentage (or wall count) on load-bearing parts for strength
+- Oversize holes slightly so shafts and screws fit after printing (printed holes shrink)
 
 ---
 
@@ -100,9 +104,9 @@ Sensor (2 pts), e.g.: limit switch to stop the lift at exact height; bumper/dist
 | 4.8 | **B** | Screw joints for pivots where a live shaft isn't needed |
 
 **4.9** *(4 pts — 2 per fix)* Any two of:
-- Brace the lift against twisting (cross-bracing/boxing between the two sides)
+- Cross-brace or box the lift with standoffs against twisting
 - Use screw joints instead of loose axles at the pivots
-- Fix spacing/add washers or bearings so joints don't bind
+- Fix spacing/add washers or spacers so joints don't bind
 - Ensure both sides are geared/linked identically so they move together
 - Correct gearing for torque so motors aren't stalling and flexing the structure
 
@@ -114,10 +118,10 @@ Controller feature (2 pts): a **button toggle** — first press starts the intak
 
 ### Score Summary Table
 
-| Section | Unit | /25 |
-|---------|------|-----|
+| Section | Topic | /25 |
+|---------|-------|-----|
 | 1 | Drivetrain Mastery | |
-| 2 | Programming Foundations | |
-| 3 | CAD and Machining | |
+| 2 | Common Parts, Tools & Fabrication | |
+| 3 | CAD & 3D Printing | |
 | 4 | Manipulators & Mechanisms | |
 | **Total** | **(pass = 80)** | **/100** |

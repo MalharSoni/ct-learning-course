@@ -6,11 +6,11 @@
 |---|---|
 | **Student Name** | ______________________________ |
 | **Date** | ______________________________ |
-| **Total Marks** | 100 points (25 per section) |
+| **Total Marks** | 100 points |
 | **Passing Score** | 80 points |
 | **Time Limit** | 75 minutes |
 
-This test covers the four core units of the V5 Foundation Program. Answer every question. For multiple choice, circle **one** answer unless the question says otherwise. Show your work on calculation questions.
+This test covers the core build units of the V5 Foundation Program. Answer every question. For multiple choice, circle **one** answer unless the question says otherwise. Show your work on calculation questions.
 
 ---
 
@@ -53,7 +53,7 @@ This test covers the four core units of the V5 Foundation Program. Answer every 
 - C) Frictionless — ideal for skills runs
 - D) Identical in behavior to an all-omni setup
 
-**1.6** When is a **live shaft** (and therefore a bearing) required?
+**1.6** When is a **live shaft** required?
 
 - A) On every joint of the robot, always
 - B) Only on structural crossmembers
@@ -82,139 +82,153 @@ This test covers the four core units of the V5 Foundation Program. Answer every 
 
 ---
 
-## Section 2 — Unit 2: Programming Foundations (25 points)
+## Section 2 — Unit 1: Common Parts, Tools & Fabrication (25 points)
 
 ### Multiple Choice (2 points each)
 
-**2.1** In Object-Oriented Programming, a **class** is best described as:
+**2.1** What is the primary purpose of spacers and washers on a shaft or screw?
 
-- A) A single line of code that runs once
-- B) A blueprint that defines the variables and methods of an object
-- C) A type of loop
-- D) A file that stores motor ports
+- A) To add weight to the robot for stability
+- B) To fill the space along the shaft or screw so components stay in place without rubbing metal-on-metal
+- C) To replace shaft collars entirely
+- D) To make the shaft spin faster
 
-**2.2** What is **encapsulation**?
+**2.2** How are standoffs used for "boxing" a structure?
 
-- A) Wrapping wires in electrical tape
-- B) Keeping an object's data and the methods that operate on it together, hiding internal details from outside code
-- C) Copying and pasting code between projects
-- D) Running two programs at the same time
+- A) They are only used to mount the V5 brain
+- B) They connect two parallel C-channels or plates together, turning the joint into a rigid box that resists twisting
+- C) They replace screws in high-load joints
+- D) They are decorative supports
 
-**2.3** In a robot state machine with states `IDLE`, `LIFTING`, and `PLACING`, what causes the robot to move between states?
+**2.3** What is a screw joint?
 
-- A) Nothing — states are fixed at startup
-- B) Controller input or autonomous triggers/conditions
-- C) The battery level
-- D) Recompiling the program
+- A) Any joint that uses more than one screw
+- B) A pivot where the mechanism rotates around a stationary screw instead of a live axle — usable wherever a live shaft is not required, and it can double as a structural crossmember
+- C) A joint that is glued and screwed for extra strength
+- D) A special VEX part that must be 3D printed
 
-**2.4** What is the purpose of a command class like `LiftCommand` or `ClawCommand`?
+**2.4** Where is a bearing **NOT** required?
 
-- A) To store the robot's battery statistics
-- B) To encapsulate a single robot action so it can be reused and organized cleanly
-- C) To replace the need for motors
-- D) To make the code run faster on the V5 brain
+- A) Where a drive shaft passes through a C-channel wall
+- B) On the end of a shaft inserted directly into a V5 motor — the motor supports the shaft internally
+- C) On both sides of a wheel on a live shaft
+- D) Bearings are required at every point a shaft touches anything
 
-**2.5** While testing state transitions, what simple debugging technique does the curriculum recommend to confirm the robot changed states?
+**2.5** Match the V5 motor cartridge color to its output speed:
 
-- A) Watching the motor LEDs
-- B) Printing messages to the console
-- C) Removing all sensors
-- D) Restarting the brain after every run
+- A) Red = 600 RPM, Green = 200 RPM, Blue = 100 RPM
+- B) Red = 100 RPM, Green = 200 RPM, Blue = 600 RPM
+- C) Red = 200 RPM, Green = 100 RPM, Blue = 600 RPM
+- D) All cartridges are 200 RPM; only the gears inside differ
 
-**2.6** Which line of pseudocode correctly represents the transition logic taught in Unit 2?
+**2.6** What is a key difference between the 11W and 5.5W V5 Smart Motors?
 
-- A) `if state == LIFTING → move lift motor`
-- B) `while battery > 50 → state = LIFTING`
-- C) `state = LIFTING + PLACING`
-- D) `move motor → then check state`
+- A) The 5.5W motor is faster than any 11W cartridge
+- B) The 11W motor accepts swappable cartridges (100/200/600 RPM); the 5.5W motor is fixed at 200 RPM with no interchangeable cartridge
+- C) The 11W motor cannot be used on drivetrains
+- D) They are identical except for the connector
 
-**2.7** A limit switch is added so the lift stops automatically at the top. This is an example of:
+**2.7** When cutting C-channel with a hacksaw, why should you couple (nest) two C-channels together before clamping them in the vice?
 
-- A) Open-loop control
-- B) Sensor feedback integration
-- C) Driver control
-- D) Encapsulation
+- A) It lets you skip marking the cut line
+- B) The nested channels reinforce each other, so the walls do not bend or crush in the vice and the cut stays straight and square
+- C) It makes the hacksaw blade last longer
+- D) It is only done to save time by cutting two parts at once
 
-**2.8** Which programming environment does the Foundation Program use for text-based programming?
+**2.8** After cutting metal with a hacksaw, what should you use a file for?
 
-- A) Scratch
-- B) VEXcode V5 Text (C++)
-- C) RobotC for Cortex
-- D) MATLAB
+- A) Polishing the entire part to a mirror finish
+- B) Smoothing the cut edge, removing sharp burrs, and fine-tuning the part to final size
+- C) Bending the channel to shape
+- D) Files are only used on plastic parts
 
 ### Short Answer
 
-**2.9** *(4 points)* Name the three robot behavior states used as the example in Unit 2, and describe what a **state machine** is in one or two sentences.
+**2.9** *(4 points)* Describe the correct process for cutting a C-channel to length with a hacksaw, from marking the cut to finishing the edge.
 
-**2.10** *(5 points)* You are writing an autonomous routine that picks up an object and places it on a platform. Describe the sequence of state transitions your robot would go through, and name **one** sensor you could add to make the sequence more reliable (explain what it would do).
+**2.10** *(5 points)* A wheel is driven on a live shaft that passes through both walls of a C-channel, powered by an 11W motor plugged onto one end of the shaft. State where bearings ARE needed, where a bearing is NOT needed, and why you should not add more bearings than required.
 
 ---
 
-## Section 3 — Unit 3: CAD and Machining (25 points)
+## Section 3 — Unit 3: CAD & 3D Printing (25 points)
 
 ### Multiple Choice (2 points each)
 
-**3.1** Which CAD platform does the Foundation Program use?
-
-- A) Fusion 360
-- B) SolidWorks
-- C) Onshape
-- D) TinkerCAD
-
-**3.2** Why do engineers CAD their robots before building? *(Best answer)*
-
-- A) It is required by the VEX game manual
-- B) Precision, collaboration, iteration, and documentation
-- C) It makes the robot lighter
-- D) CAD replaces the need for testing
-
-**3.3** In Onshape, where are individual parts modeled, and where are they mated together?
+**3.1** In Onshape, where are individual parts modeled, and where are they mated together?
 
 - A) Parts are modeled in Assemblies; mated in Parts Studios
 - B) Parts are modeled in Parts Studios; mated in Assemblies
 - C) Both happen in the Drawing tab
 - D) Onshape does not support assemblies
 
-**3.4** Which part library is named in the curriculum for inserting VEX components into Onshape?
+**3.2** What is a **mate connector** in Onshape?
+
+- A) A physical VEX part used to join channels
+- B) A point (with position and orientation) on a part where mates attach when assembling
+- C) A tool for measuring distances
+- D) A type of export file
+
+**3.3** What does a **FASTENED** mate do?
+
+- A) Allows rotation about one axis
+- B) Locks two parts rigidly together with zero degrees of freedom
+- C) Allows sliding along one axis
+- D) Connects a part to the origin only
+
+**3.4** What does a **REVOLUTE** mate do?
+
+- A) Locks two parts rigidly together
+- B) Allows rotation about a single axis — one rotational degree of freedom
+- C) Allows free movement in all directions
+- D) Mirrors a part across a plane
+
+**3.5** You are assembling a drivetrain in Onshape. Which mates are correct for (a) a wheel spinning on its axle and (b) a C-channel screwed to another C-channel?
+
+- A) (a) Fastened, (b) Revolute
+- B) (a) Revolute, (b) Fastened
+- C) Both Revolute
+- D) Both Fastened
+
+**3.6** Which part library is named in the curriculum for inserting VEX components into Onshape?
 
 - A) MKCAD
 - B) GrabCAD
 - C) Thingiverse
 - D) McMaster-Carr
 
-**3.5** What file format do you export from Onshape to send a custom part to the CNC?
+**3.7** What file format do you export from Onshape to 3D print a custom part?
 
-- A) .stl
+- A) .dxf
 - B) .pdf
-- C) .dxf
+- C) .stl
 - D) .docx
 
-**3.6** Before drilling a hole in aluminum, you should first:
+**3.8** What does the slicer do with your STL file before printing?
 
-- A) Sand the surface with the belt sander
-- B) Center punch the hole location (and use a pilot hole for accuracy)
-- C) Heat the metal
-- D) File the edges
+- A) It checks the file for viruses
+- B) It converts the 3D model into layer-by-layer instructions (G-code) the printer can execute, using your settings like layer height and infill
+- C) It shrinks the model to fit the print bed automatically
+- D) It uploads the model to Onshape
 
-**3.7** What is **deburring**?
+**3.9** Why is 45° considered the limit for support-free overhangs in 3D printing?
 
-- A) Removing sharp leftover material from drilled holes and cut edges
-- B) Painting the part
-- C) Measuring the part with calipers
-- D) Exporting the CAD file
+- A) The printer nozzle physically cannot tilt past 45°
+- B) Beyond about 45°, each layer overhangs too far past the layer below it, so the plastic droops without support material
+- C) It is only a stylistic guideline
+- D) Overhangs of any angle always need supports
 
-**3.8** After test-fitting a machined part on the robot, you discover the holes are slightly misaligned. According to the Unit 3 workflow, what should you do?
+**3.10** What is the trade-off of printing a part with LOWER infill percentage?
 
-- A) Force the screws in with a bigger driver
-- B) Throw the part away and start a new design from scratch
-- C) Diagnose the misalignment, adjust the CAD (tolerances/hole placement), and re-machine if necessary
-- D) Ignore it — small misalignments never matter
+- A) Lighter, faster, and cheaper to print — but weaker
+- B) Stronger but heavier
+- C) No difference except color
+- D) Lower infill always causes the print to fail
 
 ### Short Answer
 
-**3.9** *(4 points)* Name **two** hand-finishing tools/techniques from Lesson 3 (drilling, filing, sanding) and state what each is used for.
-
-**3.10** *(5 points)* What is a **tolerance** in CAD, and why does it matter when designing a custom bracket with holes for shafts and screws? Give one example of a tolerance decision you would make.
+**3.11** *(5 points)* You are assembling a four-bar lift in Onshape and 3D printing a custom bracket for it.
+(a) State which mate you would use at each pivot and which mate for the screwed structural joints, and why.
+(b) Give **two** design decisions you would make so the printed bracket is strong and prints cleanly (think orientation, overhangs, infill, or hole tolerances).
 
 ---
 
@@ -286,4 +300,4 @@ This test covers the four core units of the V5 Foundation Program. Answer every 
 
 ---
 
-*End of test. Check that you answered all 40 questions before submitting.*
+*End of test. Check that you answered all 41 questions before submitting.*

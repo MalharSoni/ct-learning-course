@@ -39,16 +39,16 @@ export const v5FoundationTest: Assessment = {
   id: 'v5-foundation-test',
   title: 'CTRC V5 Foundation Program — Unit Test',
   description:
-    'This test covers the four core units of the V5 Foundation Program. Multiple choice questions are graded automatically; short answer questions are reviewed by your instructor.',
+    'This test covers the core build units of the V5 Foundation Program: drivetrains, common parts and fabrication, CAD and 3D printing, and manipulators. Multiple choice questions are graded automatically; short answer questions are reviewed by your instructor.',
   totalPoints: 100,
   passingScore: 80,
   timeLimitMinutes: 75,
   sections: [
     {
-      id: 'unit-1',
+      id: 'drivetrain',
       title: 'Unit 1: Drivetrain Mastery',
       description:
-        'Safety, common parts, drivetrain geometry, drive types, gearing, and maintenance.',
+        'Drivetrain geometry, drive types, live shafts, friction, and maintenance.',
       questions: [
         {
           kind: 'multiple-choice',
@@ -128,7 +128,7 @@ export const v5FoundationTest: Assessment = {
         {
           kind: 'multiple-choice',
           id: '1-6',
-          prompt: 'When is a live shaft (and therefore a bearing) required?',
+          prompt: 'When is a live shaft required?',
           options: [
             'On every joint of the robot, always',
             'Only on structural crossmembers',
@@ -138,7 +138,7 @@ export const v5FoundationTest: Assessment = {
           correctIndex: 2,
           points: 2,
           explanation:
-            'Live shafts connect two rotating objects (like motor to wheel) and need bearings to spin freely.',
+            'Live shafts connect two rotating objects (like motor to wheel); where they pass through structure they need bearings to spin freely.',
         },
         {
           kind: 'multiple-choice',
@@ -187,174 +187,161 @@ export const v5FoundationTest: Assessment = {
       ],
     },
     {
-      id: 'unit-2',
-      title: 'Unit 2: Programming Foundations',
+      id: 'parts-fabrication',
+      title: 'Unit 1: Common Parts, Tools & Fabrication',
       description:
-        'Object-oriented programming, state machines, command patterns, and sensor feedback in VEXcode V5 Text.',
+        'Spacers, standoffs and boxing, screw joints, bearings, motors and cartridges, and hand-tool techniques.',
       questions: [
         {
           kind: 'multiple-choice',
           id: '2-1',
-          prompt: 'In Object-Oriented Programming, a class is best described as:',
+          prompt: 'What is the primary purpose of spacers and washers on a shaft or screw?',
           options: [
-            'A single line of code that runs once',
-            'A blueprint that defines the variables and methods of an object',
-            'A type of loop',
-            'A file that stores motor ports',
+            'To add weight to the robot for stability',
+            'To fill the space along the shaft or screw so components stay in place without rubbing metal-on-metal',
+            'To replace shaft collars entirely',
+            'To make the shaft spin faster',
           ],
           correctIndex: 1,
           points: 2,
-          explanation: 'A class is a blueprint defining data (variables) and behavior (methods).',
+          explanation:
+            'Spacers and washers set friction-free spacing: components stay where they belong without sliding or grinding against structure.',
         },
         {
           kind: 'multiple-choice',
           id: '2-2',
-          prompt: 'What is encapsulation?',
+          prompt: 'How are standoffs used for "boxing" a structure?',
           options: [
-            'Wrapping wires in electrical tape',
-            "Keeping an object's data and the methods that operate on it together, hiding internal details from outside code",
-            'Copying and pasting code between projects',
-            'Running two programs at the same time',
+            'They are only used to mount the V5 brain',
+            'They connect two parallel C-channels or plates together, turning the joint into a rigid box that resists twisting',
+            'They replace screws in high-load joints',
+            'They are decorative supports',
           ],
           correctIndex: 1,
           points: 2,
-          explanation: 'Encapsulation bundles data and methods together and hides internal details.',
+          explanation:
+            'Boxing with standoffs ties parallel members together so the joint acts like a rigid box instead of a flexible single wall.',
         },
         {
           kind: 'multiple-choice',
           id: '2-3',
-          prompt:
-            'In a robot state machine with states IDLE, LIFTING, and PLACING, what causes the robot to move between states?',
+          prompt: 'What is a screw joint?',
           options: [
-            'Nothing — states are fixed at startup',
-            'Controller input or autonomous triggers/conditions',
-            'The battery level',
-            'Recompiling the program',
+            'Any joint that uses more than one screw',
+            'A pivot where the mechanism rotates around a stationary screw instead of a live axle — usable wherever a live shaft is not required, and it can double as a structural crossmember',
+            'A joint that is glued and screwed for extra strength',
+            'A special VEX part that must be 3D printed',
           ],
           correctIndex: 1,
           points: 2,
-          explanation: 'States switch based on controller input or autonomous triggers.',
+          explanation:
+            'Screw joints pivot around a stationary screw. They work anywhere a live shaft is not required and can double as structural crossmembers.',
         },
         {
           kind: 'multiple-choice',
           id: '2-4',
-          prompt: 'What is the purpose of a command class like LiftCommand or ClawCommand?',
+          prompt: 'Where is a bearing NOT required?',
           options: [
-            "To store the robot's battery statistics",
-            'To encapsulate a single robot action so it can be reused and organized cleanly',
-            'To replace the need for motors',
-            'To make the code run faster on the V5 brain',
+            'Where a drive shaft passes through a C-channel wall',
+            'On the end of a shaft inserted directly into a V5 motor — the motor supports the shaft internally',
+            'On both sides of a wheel on a live shaft',
+            'Bearings are required at every point a shaft touches anything',
           ],
           correctIndex: 1,
           points: 2,
-          explanation: 'Command classes encapsulate one action each, keeping code organized and reusable.',
+          explanation:
+            'The motor itself supports the shaft internally, so no bearing is needed at the motor. Extra bearings beyond what is required just add unnecessary friction.',
         },
         {
           kind: 'multiple-choice',
           id: '2-5',
-          prompt:
-            'While testing state transitions, what simple debugging technique does the curriculum recommend to confirm the robot changed states?',
+          prompt: 'Match the V5 motor cartridge color to its output speed:',
           options: [
-            'Watching the motor LEDs',
-            'Printing messages to the console',
-            'Removing all sensors',
-            'Restarting the brain after every run',
+            'Red = 600 RPM, Green = 200 RPM, Blue = 100 RPM',
+            'Red = 100 RPM, Green = 200 RPM, Blue = 600 RPM',
+            'Red = 200 RPM, Green = 100 RPM, Blue = 600 RPM',
+            'All cartridges are 200 RPM; only the gears inside differ',
           ],
           correctIndex: 1,
           points: 2,
-          explanation: 'Console prints confirm state transitions during testing.',
+          explanation: 'Red = 100 RPM (torque), Green = 200 RPM (standard), Blue = 600 RPM (speed).',
         },
         {
           kind: 'multiple-choice',
           id: '2-6',
-          prompt: 'Which line of pseudocode correctly represents the transition logic taught in Unit 2?',
+          prompt:
+            'What is a key difference between the 11W and 5.5W V5 Smart Motors?',
           options: [
-            'if state == LIFTING → move lift motor',
-            'while battery > 50 → state = LIFTING',
-            'state = LIFTING + PLACING',
-            'move motor → then check state',
+            'The 5.5W motor is faster than any 11W cartridge',
+            'The 11W motor accepts swappable cartridges (100/200/600 RPM); the 5.5W motor is fixed at 200 RPM with no interchangeable cartridge',
+            'The 11W motor cannot be used on drivetrains',
+            'They are identical except for the connector',
           ],
-          correctIndex: 0,
+          correctIndex: 1,
           points: 2,
-          explanation: 'Behavior depends on the current state: if state == LIFTING → move motor.',
+          explanation:
+            'The 11W motor takes 100/200/600 RPM cartridges; the 5.5W motor has a fixed 200 RPM output and no swappable cartridge.',
         },
         {
           kind: 'multiple-choice',
           id: '2-7',
           prompt:
-            'A limit switch is added so the lift stops automatically at the top. This is an example of:',
+            'When cutting C-channel with a hacksaw, why should you couple (nest) two C-channels together before clamping them in the vice?',
           options: [
-            'Open-loop control',
-            'Sensor feedback integration',
-            'Driver control',
-            'Encapsulation',
+            'It lets you skip marking the cut line',
+            'The nested channels reinforce each other, so the walls do not bend or crush in the vice and the cut stays straight and square',
+            'It makes the hacksaw blade last longer',
+            'It is only done to save time by cutting two parts at once',
           ],
           correctIndex: 1,
           points: 2,
-          explanation: 'Using a sensor to affect behavior is sensor feedback integration.',
+          explanation:
+            'Nesting the channels reinforces the thin walls so the vice cannot crush them, and the extra rigidity keeps the cut straight and square.',
         },
         {
           kind: 'multiple-choice',
           id: '2-8',
-          prompt:
-            'Which programming environment does the Foundation Program use for text-based programming?',
-          options: ['Scratch', 'VEXcode V5 Text (C++)', 'RobotC for Cortex', 'MATLAB'],
+          prompt: 'After cutting metal with a hacksaw, what should you use a file for?',
+          options: [
+            'Polishing the entire part to a mirror finish',
+            'Smoothing the cut edge, removing sharp burrs, and fine-tuning the part to final size',
+            'Bending the channel to shape',
+            'Files are only used on plastic parts',
+          ],
           correctIndex: 1,
           points: 2,
-          explanation: 'The program uses VEXcode V5 Text.',
+          explanation:
+            'Filing cleans up the cut: it smooths sharp edges, removes burrs, and lets you sneak up on the final dimension.',
         },
         {
           kind: 'short-answer',
           id: '2-9',
           prompt:
-            'Name the three robot behavior states used as the example in Unit 2, and describe what a state machine is in one or two sentences.',
+            'Describe the correct process for cutting a C-channel to length with a hacksaw, from marking the cut to finishing the edge.',
           points: 4,
           modelAnswer:
-            'States: IDLE, LIFTING, PLACING. A state machine is a program structure where the robot is always in exactly one defined state and moves between states when conditions or inputs trigger a transition; behavior depends on the current state.',
+            'Mark the cut line, couple/nest a second C-channel with the one being cut for rigidity, clamp the pair securely in the vice close to the cut line, cut with steady full strokes on the marked line, then file the cut edge smooth to remove burrs and reach final size.',
         },
         {
           kind: 'short-answer',
           id: '2-10',
           prompt:
-            'You are writing an autonomous routine that picks up an object and places it on a platform. Describe the sequence of state transitions your robot would go through, and name one sensor you could add to make the sequence more reliable (explain what it would do).',
+            'A wheel is driven on a live shaft that passes through both walls of a C-channel, powered by an 11W motor plugged onto one end of the shaft. State where bearings ARE needed, where a bearing is NOT needed, and why you should not add more bearings than required.',
           points: 5,
           modelAnswer:
-            'Example: IDLE → intake/grab state when the routine begins → LIFTING (raise to target height) → PLACING (release object) → back to IDLE. Sensor: a limit switch to stop the lift at exact height, a bumper/distance sensor to confirm the object is captured before lifting, or encoder feedback to verify lift position.',
+            'Bearings are needed where the shaft passes through each C-channel wall so the live shaft spins smoothly. No bearing is needed at the motor — the motor supports the shaft internally. Extra bearings beyond what is required just add unnecessary friction.',
         },
       ],
     },
     {
-      id: 'unit-3',
-      title: 'Unit 3: CAD and Machining',
+      id: 'cad-3d-printing',
+      title: 'Unit 3: CAD & 3D Printing',
       description:
-        'Onshape fundamentals, custom parts, CNC, drilling, filing, sanding, and tolerance adjustment.',
+        'Onshape Parts Studios, Assemblies, mates (fastened and revolute), and designing parts for 3D printing.',
       questions: [
         {
           kind: 'multiple-choice',
           id: '3-1',
-          prompt: 'Which CAD platform does the Foundation Program use?',
-          options: ['Fusion 360', 'SolidWorks', 'Onshape', 'TinkerCAD'],
-          correctIndex: 2,
-          points: 2,
-          explanation: 'The program teaches Onshape.',
-        },
-        {
-          kind: 'multiple-choice',
-          id: '3-2',
-          prompt: 'Why do engineers CAD their robots before building?',
-          options: [
-            'It is required by the VEX game manual',
-            'Precision, collaboration, iteration, and documentation',
-            'It makes the robot lighter',
-            'CAD replaces the need for testing',
-          ],
-          correctIndex: 1,
-          points: 2,
-          explanation: 'CAD enables precision, collaboration, iteration, and documentation.',
-        },
-        {
-          kind: 'multiple-choice',
-          id: '3-3',
           prompt: 'In Onshape, where are individual parts modeled, and where are they mated together?',
           options: [
             'Parts are modeled in Assemblies; mated in Parts Studios',
@@ -368,7 +355,68 @@ export const v5FoundationTest: Assessment = {
         },
         {
           kind: 'multiple-choice',
+          id: '3-2',
+          prompt: 'What is a mate connector in Onshape?',
+          options: [
+            'A physical VEX part used to join channels',
+            'A point (with position and orientation) on a part where mates attach when assembling',
+            'A tool for measuring distances',
+            'A type of export file',
+          ],
+          correctIndex: 1,
+          points: 2,
+          explanation:
+            'Mate connectors are the snap points — each one carries a position and orientation that mates use to align parts.',
+        },
+        {
+          kind: 'multiple-choice',
+          id: '3-3',
+          prompt: 'What does a FASTENED mate do?',
+          options: [
+            'Allows rotation about one axis',
+            'Locks two parts rigidly together with zero degrees of freedom',
+            'Allows sliding along one axis',
+            'Connects a part to the origin only',
+          ],
+          correctIndex: 1,
+          points: 2,
+          explanation:
+            'Fastened removes all degrees of freedom — use it for parts that are screwed or fixed together.',
+        },
+        {
+          kind: 'multiple-choice',
           id: '3-4',
+          prompt: 'What does a REVOLUTE mate do?',
+          options: [
+            'Locks two parts rigidly together',
+            'Allows rotation about a single axis — one rotational degree of freedom',
+            'Allows free movement in all directions',
+            'Mirrors a part across a plane',
+          ],
+          correctIndex: 1,
+          points: 2,
+          explanation:
+            'Revolute leaves exactly one rotational degree of freedom — the mate for anything that spins or pivots.',
+        },
+        {
+          kind: 'multiple-choice',
+          id: '3-5',
+          prompt:
+            'You are assembling a drivetrain in Onshape. Which mates are correct for (a) a wheel spinning on its axle and (b) a C-channel screwed to another C-channel?',
+          options: [
+            '(a) Fastened, (b) Revolute',
+            '(a) Revolute, (b) Fastened',
+            'Both Revolute',
+            'Both Fastened',
+          ],
+          correctIndex: 1,
+          points: 2,
+          explanation:
+            'The wheel needs to rotate → revolute. The screwed structure must be rigid → fastened.',
+        },
+        {
+          kind: 'multiple-choice',
+          id: '3-6',
           prompt:
             'Which part library is named in the curriculum for inserting VEX components into Onshape?',
           options: ['MKCAD', 'GrabCAD', 'Thingiverse', 'McMaster-Carr'],
@@ -378,79 +426,71 @@ export const v5FoundationTest: Assessment = {
         },
         {
           kind: 'multiple-choice',
-          id: '3-5',
-          prompt: 'What file format do you export from Onshape to send a custom part to the CNC?',
-          options: ['.stl', '.pdf', '.dxf', '.docx'],
+          id: '3-7',
+          prompt: 'What file format do you export from Onshape to 3D print a custom part?',
+          options: ['.dxf', '.pdf', '.stl', '.docx'],
           correctIndex: 2,
           points: 2,
-          explanation: 'DXF files are exported from Onshape for CNC cutting.',
-        },
-        {
-          kind: 'multiple-choice',
-          id: '3-6',
-          prompt: 'Before drilling a hole in aluminum, you should first:',
-          options: [
-            'Sand the surface with the belt sander',
-            'Center punch the hole location (and use a pilot hole for accuracy)',
-            'Heat the metal',
-            'File the edges',
-          ],
-          correctIndex: 1,
-          points: 2,
-          explanation: 'Center punching (and pilot holes) keep the drill bit from wandering.',
-        },
-        {
-          kind: 'multiple-choice',
-          id: '3-7',
-          prompt: 'What is deburring?',
-          options: [
-            'Removing sharp leftover material from drilled holes and cut edges',
-            'Painting the part',
-            'Measuring the part with calipers',
-            'Exporting the CAD file',
-          ],
-          correctIndex: 0,
-          points: 2,
-          explanation: 'Deburring removes sharp burrs left by drilling and cutting.',
+          explanation: 'STL is the standard export format for 3D printing.',
         },
         {
           kind: 'multiple-choice',
           id: '3-8',
-          prompt:
-            'After test-fitting a machined part on the robot, you discover the holes are slightly misaligned. According to the Unit 3 workflow, what should you do?',
+          prompt: 'What does the slicer do with your STL file before printing?',
           options: [
-            'Force the screws in with a bigger driver',
-            'Throw the part away and start a new design from scratch',
-            'Diagnose the misalignment, adjust the CAD (tolerances/hole placement), and re-machine if necessary',
-            'Ignore it — small misalignments never matter',
+            'It checks the file for viruses',
+            'It converts the 3D model into layer-by-layer instructions (G-code) the printer can execute, using your settings like layer height and infill',
+            'It shrinks the model to fit the print bed automatically',
+            'It uploads the model to Onshape',
           ],
-          correctIndex: 2,
+          correctIndex: 1,
           points: 2,
           explanation:
-            'The workflow is: diagnose via CAD, adjust tolerances or hole placement, and re-machine if needed.',
+            'Slicing turns the model into layers and toolpaths — the printer instructions — based on settings like layer height, infill, and supports.',
         },
         {
-          kind: 'short-answer',
+          kind: 'multiple-choice',
           id: '3-9',
-          prompt:
-            'Name two hand-finishing tools/techniques from Lesson 3 (drilling, filing, sanding) and state what each is used for.',
-          points: 4,
-          modelAnswer:
-            'Any two: drill press with twist/step bits (accurate holes, clamped work), files — flat/round/half-round (smoothing edges, precise dimensions, deburring holes), belt sander (clean aluminum edges, sneaking up on final size), center punch (marking hole locations so the bit does not wander).',
+          prompt: 'Why is 45° considered the limit for support-free overhangs in 3D printing?',
+          options: [
+            'The printer nozzle physically cannot tilt past 45°',
+            'Beyond about 45°, each layer overhangs too far past the layer below it, so the plastic droops without support material',
+            'It is only a stylistic guideline',
+            'Overhangs of any angle always need supports',
+          ],
+          correctIndex: 1,
+          points: 2,
+          explanation:
+            'Each layer can only overhang the previous one a little; past ~45° there is not enough material underneath and the print sags.',
+        },
+        {
+          kind: 'multiple-choice',
+          id: '3-10',
+          prompt: 'What is the trade-off of printing a part with LOWER infill percentage?',
+          options: [
+            'Lighter, faster, and cheaper to print — but weaker',
+            'Stronger but heavier',
+            'No difference except color',
+            'Lower infill always causes the print to fail',
+          ],
+          correctIndex: 0,
+          points: 2,
+          explanation:
+            'Lower infill saves material and print time and reduces weight, at the cost of part strength.',
         },
         {
           kind: 'short-answer',
-          id: '3-10',
+          id: '3-11',
           prompt:
-            'What is a tolerance in CAD, and why does it matter when designing a custom bracket with holes for shafts and screws? Give one example of a tolerance decision you would make.',
+            'You are assembling a four-bar lift in Onshape and 3D printing a custom bracket for it. (a) State which mate you would use at each pivot and which mate for the screwed structural joints, and why. (b) Give two design decisions you would make so the printed bracket is strong and prints cleanly (think orientation, overhangs, infill, or hole tolerances).',
           points: 5,
           modelAnswer:
-            'A tolerance is the allowable variation between the designed dimension and the real part. It matters because parts must physically fit — holes must clear screws and shafts, and machining is never perfectly exact. Example: oversizing a shaft hole slightly so the shaft spins freely, or sizing screw holes for clearance vs. thread engagement.',
+            '(a) Revolute mates at each of the four pivots because each linkage joint rotates about one axis; fastened mates for the screwed structural joints because they must be rigid with zero degrees of freedom. (b) Any two: orient the print so layer lines run perpendicular to the load (parts split along layer lines), avoid overhangs past 45° or add supports/chamfers, raise infill (or add wall perimeters) for strength on load-bearing parts, and oversize holes slightly so shafts and screws fit after printing.',
         },
       ],
     },
     {
-      id: 'unit-4',
+      id: 'manipulators',
       title: 'Unit 4: Manipulators & Mechanisms',
       description:
         'Lift systems, intakes, torque and speed, gear ratios, and mechanism programming.',
@@ -573,7 +613,7 @@ export const v5FoundationTest: Assessment = {
             'Your four-bar lift twists side to side and binds when raising. Using Unit 4 concepts, give two specific fixes.',
           points: 4,
           modelAnswer:
-            'Any two: cross-brace or box the lift against twisting, use screw joints instead of loose axles at the pivots, fix spacing or add washers/bearings so joints do not bind, link/gear both sides identically so they move together, correct the gearing for torque so motors are not stalling and flexing the structure.',
+            'Any two: cross-brace or box the lift with standoffs against twisting, use screw joints instead of loose axles at the pivots, fix spacing or add washers/spacers so joints do not bind, link/gear both sides identically so they move together, correct the gearing for torque so motors are not stalling and flexing the structure.',
         },
         {
           kind: 'short-answer',
@@ -594,4 +634,8 @@ export function assessmentAutoGradedPoints(assessment: Assessment): number {
     .flatMap((s) => s.questions)
     .filter((q) => q.kind === 'multiple-choice')
     .reduce((sum, q) => sum + q.points, 0);
+}
+
+export function assessmentQuestionCount(assessment: Assessment): number {
+  return assessment.sections.reduce((sum, s) => sum + s.questions.length, 0);
 }

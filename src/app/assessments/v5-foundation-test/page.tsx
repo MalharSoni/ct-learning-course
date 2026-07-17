@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import {
   v5FoundationTest,
   assessmentAutoGradedPoints,
+  assessmentQuestionCount,
   type AssessmentQuestion,
 } from '@/lib/assessment-data';
 import {
@@ -174,7 +175,7 @@ function IntroCard({ onStart }: { onStart: () => void }) {
           <InfoTile
             icon={<CheckCircle2 size={16} />}
             label="Sections"
-            value={`${test.sections.length} units · 40 questions`}
+            value={`${test.sections.length} sections · ${assessmentQuestionCount(test)} questions`}
           />
         </div>
         <ul className="space-y-1.5 text-[13px] text-muted-foreground">
