@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/collapsible';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { ChevronRight, BookOpen, Wrench, Home } from 'lucide-react';
+import { ChevronRight, BookOpen, ClipboardCheck, BarChart3, Wrench, Home } from 'lucide-react';
 import { learningCourse, projects } from '@/lib/curriculum-data';
 
 export function Sidebar() {
@@ -129,6 +129,44 @@ export function Sidebar() {
               </CollapsibleContent>
             </Collapsible>
           ))}
+
+          <Separator className="my-3" />
+
+          {/* Assessments Section */}
+          <div className="px-3 py-2">
+            <div className="flex items-center gap-2">
+              <ClipboardCheck size={14} className="text-muted-foreground" />
+              <h3 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                Assessments
+              </h3>
+            </div>
+          </div>
+
+          <Link
+            href="/assessments/v5-foundation-test"
+            className={cn(
+              'flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[13px] font-medium transition-all duration-150 mb-1',
+              pathname === '/assessments/v5-foundation-test'
+                ? 'bg-accent text-accent-foreground shadow-sm font-semibold'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground active:scale-[0.98]'
+            )}
+          >
+            <ClipboardCheck size={14} />
+            V5 Foundation Unit Test
+          </Link>
+
+          <Link
+            href="/assessments/v5-foundation-test/results"
+            className={cn(
+              'flex items-center gap-2.5 rounded-lg px-3 py-2 text-[12.5px] font-medium transition-all duration-150 mb-1',
+              pathname === '/assessments/v5-foundation-test/results'
+                ? 'bg-accent text-accent-foreground shadow-sm font-semibold'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground active:scale-[0.98]'
+            )}
+          >
+            <BarChart3 size={14} />
+            Results (instructor)
+          </Link>
 
           <Separator className="my-3" />
 
