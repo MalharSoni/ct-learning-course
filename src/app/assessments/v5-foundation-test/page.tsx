@@ -32,11 +32,15 @@ const test = v5FoundationTest;
 const autoGradedPoints = assessmentAutoGradedPoints(test);
 const manualPoints = test.totalPoints - autoGradedPoints;
 
+type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+
 export default function V5FoundationTestPage() {
   // stage: -1 = intro, 0..n-1 = section index, n = submitted/results
   const [stage, setStage] = useState(-1);
   const [answers, setAnswers] = useState<Answers>({});
   const [showErrors, setShowErrors] = useState(false);
+  const [name, setName] = useState('');
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
 
   const totalQuestions = useMemo(
     () => test.sections.reduce((sum, s) => sum + s.questions.length, 0),
@@ -65,8 +69,39 @@ export default function V5FoundationTestPage() {
       return;
     }
     setShowErrors(false);
+    const isLastSection = stage === test.sections.length - 1;
+    if (isLastSection) submitResults();
     setStage(stage + 1);
     window.scrollTo({ top: 0 });
+  };
+
+  const submitResults = () => {
+    let earned = 0;
+    for (const q of test.sections.flatMap((s) => s.questions)) {
+      if (q.kind === 'multiple-choice' && answers[q.id] === q.correctIndex) {
+        earned += q.points;
+      }
+    }
+    const cleanAnswers: Record<string, number | string> = {};
+    for (const [k, v] of Object.entries(answers)) {
+      if (v !== undefined) cleanAnswers[k] = v;
+    }
+    setSaveStatus('saving');
+    fetch('/api/assessments/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: name.trim(),
+        assessmentId: test.id,
+        autoScore: earned,
+        autoMax: autoGradedPoints,
+        totalMax: test.totalPoints,
+        passingScore: test.passingScore,
+        answers: cleanAnswers,
+      }),
+    })
+      .then((res) => setSaveStatus(res.ok ? 'saved' : 'error'))
+      .catch(() => setSaveStatus('error'));
   };
 
   const goBack = () => {
@@ -78,6 +113,7 @@ export default function V5FoundationTestPage() {
   const retake = () => {
     setAnswers({});
     setShowErrors(false);
+    setSaveStatus('idle');
     setStage(-1);
     window.scrollTo({ top: 0 });
   };
@@ -98,7 +134,13 @@ export default function V5FoundationTestPage() {
       <Topbar title="V5 Foundation Unit Test" />
       <main className="ml-[280px] min-h-screen transition-colors" role="main">
         <div className="mx-auto max-w-3xl px-6 py-10 lg:px-8 lg:py-12 space-y-4">
-          {stage === -1 && <IntroCard onStart={() => setStage(0)} />}
+          {stage === -1 && (
+            <IntroCard
+              name={name}
+              setName={setName}
+              onStart={() => setStage(0)}
+            />
+          )}
 
           {stage >= 0 && !isSubmitted && (
             <>
@@ -138,7 +180,13 @@ export default function V5FoundationTestPage() {
           )}
 
           {isSubmitted && (
-            <ResultsView answers={answers} score={score} onRetake={retake} />
+            <ResultsView
+              answers={answers}
+              score={score}
+              name={name}
+              saveStatus={saveStatus}
+              onRetake={retake}
+            />
           )}
         </div>
       </main>
@@ -152,7 +200,16 @@ function isAnswered(q: AssessmentQuestion, answers: Answers): boolean {
   return typeof value === 'string' && value.trim().length > 0;
 }
 
-function IntroCard({ onStart }: { onStart: () => void }) {
+function IntroCard({
+  name,
+  setName,
+  onStart,
+}: {
+  name: string;
+  setName: (v: string) => void;
+  onStart: () => void;
+}) {
+  const canStart = name.trim().length > 0;
   return (
     <Card className="overflow-hidden pt-0">
       <div className="h-2.5 bg-accent" />
@@ -186,7 +243,32 @@ function IntroCard({ onStart }: { onStart: () => void }) {
           <li>• Short answers ({manualPoints} pts) are reviewed by your instructor.</li>
           <li>• You can go back to previous sections before submitting.</li>
         </ul>
-        <Button size="lg" onClick={onStart} className="w-full sm:w-auto">
+        <div className="space-y-1.5">
+          <label htmlFor="student-name" className="text-[13px] font-semibold">
+            Full name
+            <span className="text-red-500 ml-1" aria-label="required">
+              *
+            </span>
+          </label>
+          <input
+            id="student-name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && canStart && onStart()}
+            maxLength={120}
+            placeholder="Enter your full name"
+            className="w-full max-w-sm rounded-lg border border-border bg-background px-3.5 py-2.5 text-[14px] outline-none transition-colors focus:border-accent focus:ring-2 focus:ring-accent/20"
+          />
+          <p className="text-[12px] text-muted-foreground">
+            Your name and score are recorded for your instructor.
+          </p>
+        </div>
+        <Button
+          size="lg"
+          onClick={onStart}
+          disabled={!canStart}
+          className="w-full sm:w-auto"
+        >
           Start test
           <ArrowRight size={16} className="ml-1.5" />
         </Button>
@@ -357,10 +439,14 @@ function SectionForm({
 function ResultsView({
   answers,
   score,
+  name,
+  saveStatus,
   onRetake,
 }: {
   answers: Answers;
   score: number;
+  name: string;
+  saveStatus: SaveStatus;
   onRetake: () => void;
 }) {
   return (
@@ -374,6 +460,30 @@ function ResultsView({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {name.trim() && (
+            <div
+              className={cn(
+                'rounded-lg border px-3.5 py-2.5 text-[13px]',
+                saveStatus === 'saved'
+                  ? 'border-green-500/50 bg-green-500/10 text-green-700 dark:text-green-400'
+                  : saveStatus === 'error'
+                    ? 'border-amber-500/50 bg-amber-500/10 text-amber-700 dark:text-amber-400'
+                    : 'border-border bg-muted/40 text-muted-foreground'
+              )}
+            >
+              {saveStatus === 'saving' && <>Saving your result…</>}
+              {saveStatus === 'saved' && (
+                <>Recorded for {name.trim()} — your instructor can see this score.</>
+              )}
+              {saveStatus === 'error' && (
+                <>
+                  Your score is shown below, but it could not be saved to the server.
+                  Let your instructor know, or retake to try again.
+                </>
+              )}
+              {saveStatus === 'idle' && <>Result ready.</>}
+            </div>
+          )}
           <div className="rounded-lg border border-border bg-muted/40 p-4">
             <div className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
               Auto-graded score (multiple choice)
