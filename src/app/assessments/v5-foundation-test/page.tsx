@@ -26,6 +26,8 @@ import {
 
 type Answers = Record<string, number | string | undefined>;
 
+const pts = (n: number) => `${n} ${n === 1 ? 'pt' : 'pts'}`;
+
 const test = v5FoundationTest;
 const autoGradedPoints = assessmentAutoGradedPoints(test);
 const manualPoints = test.totalPoints - autoGradedPoints;
@@ -293,7 +295,7 @@ function SectionForm({
                   </span>
                 </p>
                 <span className="shrink-0 rounded-full bg-muted px-2.5 py-0.5 text-[11px] font-semibold text-muted-foreground">
-                  {q.points} pts
+                  {pts(q.points)}
                 </span>
               </div>
 
@@ -436,7 +438,7 @@ function ResultCard({
             badge={
               <span className="flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-0.5 text-[11px] font-semibold text-amber-600 dark:text-amber-400">
                 <Hourglass size={11} />
-                Instructor graded · {question.points} pts
+                Instructor graded · {pts(question.points)}
               </span>
             }
           />
@@ -466,11 +468,11 @@ function ResultCard({
             correct ? (
               <span className="flex items-center gap-1 rounded-full bg-green-500/15 px-2.5 py-0.5 text-[11px] font-semibold text-green-600 dark:text-green-400">
                 <CheckCircle2 size={11} />
-                {question.points} / {question.points} pts
+                {question.points} / {pts(question.points)}
               </span>
             ) : (
               <span className="flex items-center gap-1 rounded-full bg-red-500/15 px-2.5 py-0.5 text-[11px] font-semibold text-red-600 dark:text-red-400">
-                <XCircle size={11} />0 / {question.points} pts
+                <XCircle size={11} />0 / {pts(question.points)}
               </span>
             )
           }
