@@ -13,6 +13,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { ChevronRight, BookOpen, ClipboardCheck, BarChart3, Wrench, Home } from 'lucide-react';
 import { learningCourse, projects } from '@/lib/curriculum-data';
+import { v5Assessments } from '@/lib/assessment-data';
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -142,24 +143,28 @@ export function Sidebar() {
             </div>
           </div>
 
-          <Link
-            href="/assessments/v5-foundation-test"
-            className={cn(
-              'flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[13px] font-medium transition-all duration-150 mb-1',
-              pathname === '/assessments/v5-foundation-test'
-                ? 'bg-accent text-accent-foreground shadow-sm font-semibold'
-                : 'text-muted-foreground hover:bg-muted hover:text-foreground active:scale-[0.98]'
-            )}
-          >
-            <ClipboardCheck size={14} />
-            V5 Foundation Unit Test
-          </Link>
+          {/* One entry per unit — each unit is its own submission. */}
+          {v5Assessments.map((test) => (
+            <Link
+              key={test.id}
+              href={`/assessments/${test.slug}`}
+              className={cn(
+                'flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[13px] font-medium transition-all duration-150 mb-1',
+                pathname === `/assessments/${test.slug}`
+                  ? 'bg-accent text-accent-foreground shadow-sm font-semibold'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground active:scale-[0.98]'
+              )}
+            >
+              <ClipboardCheck size={14} />
+              {test.unitLabel} Test
+            </Link>
+          ))}
 
           <Link
-            href="/assessments/v5-foundation-test/results"
+            href="/assessments/v5-unit-1/results"
             className={cn(
               'flex items-center gap-2.5 rounded-lg px-3 py-2 text-[12.5px] font-medium transition-all duration-150 mb-1',
-              pathname === '/assessments/v5-foundation-test/results'
+              pathname.endsWith('/results')
                 ? 'bg-accent text-accent-foreground shadow-sm font-semibold'
                 : 'text-muted-foreground hover:bg-muted hover:text-foreground active:scale-[0.98]'
             )}

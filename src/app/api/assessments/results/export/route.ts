@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     );
   }
 
-  const assessmentId = searchParams.get('assessment') || 'v5-foundation-test';
+  const assessmentId = searchParams.get('assessment') || 'v5-unit-1-cad';
   const rows = await listSubmissions(assessmentId);
 
   const header = [
