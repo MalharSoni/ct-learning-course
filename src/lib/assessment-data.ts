@@ -172,10 +172,10 @@ export const v5Unit1Test: Assessment = {
       questions: [
         mc(
           '2-1',
-          'Which sketch tool draws a regular shape with N equal sides, such as the hexagon that matches a VEX hex shaft?',
+          'Which sketch tool draws a regular shape with a set number of equal sides, such as a hexagon?',
           ['Slot', 'Polygon', 'Spline', 'Center Rectangle'],
           1,
-          'Polygon draws a regular shape with the number of equal sides you type, built around a dashed construction circle.'
+          'Polygon draws a regular shape with the number of equal sides you type. It is built around a dashed construction circle, so dimensioning that one circle keeps every side equal.'
         ),
         mc(
           '2-2',
@@ -186,10 +186,10 @@ export const v5Unit1Test: Assessment = {
         ),
         mc(
           '2-3',
-          'Why does the lesson tell you to use Splines sparingly?',
+          'Why is a spline usually a poor choice for a part that has to hold an exact shape?',
           ['They cannot be extruded', 'They are hard to fully constrain', 'They only work on the Top plane', 'They always turn the sketch blue'],
           1,
-          'Splines are hard to fully constrain, so line, rectangle, and arc are the first choice for most VEX parts.'
+          'A spline is a freeform curve through points you place, which makes it hard to fully constrain. Line, rectangle, and arc are easier to lock down.'
         ),
         mc(
           '2-4',
@@ -273,14 +273,14 @@ export const v5Unit1Test: Assessment = {
           'You set a Circular Pattern to 4 copies across 270 degrees instead of 360. What do you get?',
           ['Four holes evenly spread around three quarters of the circle, leaving one quarter open', 'Four holes bunched at one side', 'An error, because a pattern must be 360 degrees', 'Three holes instead of four'],
           0,
-          'A smaller total angle spreads the copies over part of the circle. The lesson’s example puts 4 holes across 270 degrees, leaving one quarter open.'
+          'The total angle sets how far around the copies spread. At 270 degrees they cover three quarters of the circle, leaving one quarter open.'
         ),
         mc(
           '2-16',
-          'You finish a sketch and one line is still blue. According to the lesson, what usually fixes it?',
+          'You finish a sketch and one line is still blue. What usually fixes it?',
           ['Adding another dimension is always the answer', 'Adding a constraint such as Equal, Parallel, or Perpendicular', 'Deleting the line and redrawing it', 'Switching the sketch to a different plane'],
           1,
-          'A blue line usually needs an Equal, Parallel, or Perpendicular constraint rather than another dimension. One constraint can do the work of five dimensions.'
+          'A blue line is under-constrained. A relationship such as Equal, Parallel, or Perpendicular usually pins it down with less clutter than adding another number.'
         ),
         {
           kind: 'short-answer',
@@ -389,10 +389,10 @@ export const v5Unit1Test: Assessment = {
         ),
         mc(
           '3-14',
-          'In the fidget spinner build, the side bearings have to spin AND slide. Which mate did the lesson use, and why?',
+          'A bearing sits in a hole and has to both spin and slide along the same axis. Which mate handles that, and why?',
           ['Fastened, because it locks the bearing in place', 'Planar, because it slides on a flat surface', 'Cylindrical, because it combines a Revolute and a Slider', 'Revolute, because it only needs to rotate'],
           2,
-          'Cylindrical is the first combined mate: Revolute plus Slider on one axis, so the bearing can both spin and slide.'
+          'Cylindrical is a combined mate: a Revolute plus a Slider on the same axis, leaving one rotational and one translational degree of freedom.'
         ),
         mc(
           '3-15',
@@ -431,21 +431,21 @@ export const v5Unit1Test: Assessment = {
         ),
         mc(
           '4-3',
-          'A dimension on your drawing is wrong because you changed a hole size on the 3D part. What is the correct fix, per the golden rule?',
+          'A dimension on your drawing is wrong because you changed a hole size on the 3D part. What is the correct fix?',
           ['Double-click the dimension text and type the correct number', 'Edit the 3D part, and the linked drawing view updates itself', 'Delete the drawing and start a new one', 'Leave it, because drawings do not need to match the model'],
           1,
           'Let the model drive the drawing. A hand-edited number lies the moment the model changes.'
         ),
         mc(
           '4-4',
-          'Which two template families does the lesson name as the ones you will see most?',
-          ['DWG and DXF', 'Metric and Imperial', 'ANSI and ISO', 'Front and Top'],
-          2,
-          'ANSI (United States, often inches) and ISO (most of the world, millimetres). You will also see JIS.'
+          'What does choosing a drawing template set up for you?',
+          ['The sheet size, the title block, and the units', 'The material the part is made from', 'Which views appear on the sheet', 'The scale the part will be printed at'],
+          0,
+          'A template sets the sheet size, title block, and units before you place a single view. ANSI templates are usually inches and ISO templates are usually millimetres.'
         ),
         mc(
           '4-5',
-          'Which four views does the lesson say you will use constantly?',
+          'Which set of views describes most parts, with nothing repeated?',
           ['Front, Top, Right, and Isometric', 'Front, Back, Left, and Right', 'Top, Bottom, Section, and Detail', 'Isometric only'],
           0,
           'Front, Top, Right, and Isometric. Start with Front, project Top and Right, and put an Isometric in a corner.'
@@ -487,7 +487,7 @@ export const v5Unit1Test: Assessment = {
         ),
         mc(
           '4-11',
-          'Which four items does the lesson say you should always fill in on the title block?',
+          'What information belongs in the title block?',
           ['Part name, scale, units, and material', 'Designer name, date, revision, and colour', 'Quantity, cost, supplier, and weight', 'Front, Top, Right, and Isometric'],
           0,
           'The title block is the boxed table in the sheet corner. Always fill in at least part name, scale, units, and material.'
@@ -530,7 +530,7 @@ export const v5Unit1Test: Assessment = {
         {
           kind: 'short-answer',
           id: '4-17',
-          prompt: 'The lesson says a drawing is only finished when a person who has never seen your 3D model could build the part from it. Using that standard, list four things you would check on a drawing before handing it over, and explain why each one matters.',
+          prompt: 'A drawing is only finished when a person who has never seen your 3D model could build the part from it. Using that standard, list four things you would check on a drawing before handing it over, and explain why each one matters.',
           points: 4,
           modelAnswer: 'Any four of: every feature dimensioned exactly once, with nothing missing or duplicated, so the maker never has to guess or choose between two numbers; only the views needed are shown, usually three or four, so nothing is ambiguous and nothing is clutter; dimensions placed in clear space around the views rather than on the part, so they stay readable; units and material stated in the title block, so the part is made from the right stock at the right size; centrelines and centremarks on every hole and round feature; the scale label checked before printing.',
         },
@@ -592,10 +592,10 @@ export const v5Unit3Test: Assessment = {
       questions: [
         mc(
           '1-1',
-          'Which of the following is one of the four shop safety rules?',
-          ['Work as fast as possible to finish before time runs out', 'Clean your workspace before and after every session', 'Keep safety glasses at your seat until you are ready to use a tool', 'Only the team captain may handle power tools'],
+          'You have finished building for the day. What are you expected to do before you leave?',
+          ['Leave your parts out so you can pick up where you left off', 'Clean your workspace and return stock parts to the rack', 'Work faster next time to make up for lost time', 'Leave tools where the next person can find them quickly'],
           1,
-          'The four rules: act with common sense; clean your workspace before and after every session; use tools only as instructed; race for perfection, not for speed.'
+          'Clean your workspace before and after every session, and return parts to the sorted rack so the next person can find them.'
         ),
         mc(
           '1-2',
@@ -606,10 +606,10 @@ export const v5Unit3Test: Assessment = {
         ),
         mc(
           '1-3',
-          'Where do most competition breakdowns come from?',
-          ['Code errors', 'Bad strategy or drive tuning', 'Something coming apart: a loose screw, wobbly shaft, or missing spacer', 'Battery failures'],
+          'Which of these is the most common reason a finished robot stops working properly?',
+          ['A code error', 'The wrong driving technique', 'Something coming apart: a loose screw, a wobbly shaft, or a missing spacer', 'A worn-out battery'],
           2,
-          'Mechanical failures are the most common. The parts are consistent; the only variable is whether you use them correctly.'
+          'Mechanical failures are the most common. The parts themselves are consistent, so the variable is whether they were assembled correctly.'
         ),
         mc(
           '1-4',
@@ -830,7 +830,7 @@ export const v5Unit3Test: Assessment = {
         ),
         mc(
           '2-12',
-          'In what order do you install the drive, according to the lesson?',
+          'In what order should you install the drive?',
           ['Motors first, then bearing flats, then shafts', 'Bearing flats first, then shafts and spacers, then mount the motors last', 'Wheels first, then the frame', 'Shafts first, then bearing flats around them'],
           1,
           'Install bearing flats before the shaft goes in, space the shaft so nothing rubs, then mount the motors last.'
@@ -973,12 +973,12 @@ export const v5Unit3Test: Assessment = {
           'You need the robot to stop sharply and stay put on a bump. Which brake mode?',
           ['COAST', 'HOLD', 'Either works the same', 'Neither; lower DRIVE_RPM instead'],
           1,
-          'HOLD makes the motors resist spinning so the robot stops sharply, which suits staying on a bump or defending a position. COAST rolls to a stop for smooth open-floor driving.'
+          'HOLD makes the motors resist spinning so the robot stops sharply and stays where you put it. COAST lets it roll to a stop, which feels smoother across open floor.'
         ),
         {
           kind: 'short-answer',
           id: '3-16',
-          prompt: 'Your robot is wired and the code is deployed, but pushing the left stick forward makes it spin in place. Describe how you would diagnose and fix this, and state the habit the lesson says you should follow while testing.',
+          prompt: 'Your robot is wired and the code is deployed, but pushing the left stick forward makes it spin in place. Describe how you would diagnose and fix this, and state the habit you should follow while testing.',
           points: 4,
           modelAnswer: 'Spinning in place means the reversed flags are wrong for one or both motors. Flip the flag on one side, deploy, and test again; if it then curves to one side, flip the flag on the side still driving backward. Repeat until forward stick means forward robot. The habit is to test and observe rather than guess by eye, and to change only one thing at a time so you can tell what caused the change.',
         },
@@ -991,7 +991,7 @@ export const v5Unit3Test: Assessment = {
       questions: [
         mc(
           '4-1',
-          'How is gear ratio calculated in this course?',
+          'How is a gear ratio calculated?',
           ['Driving teeth divided by driven teeth', 'Driven teeth divided by driving teeth', 'The two tooth counts added together', 'Motor rpm divided by wheel diameter'],
           1,
           'Gear ratio = driven teeth / driving teeth. The driving gear connects to the motor shaft; the driven gear connects to the wheel axle.'
@@ -1033,10 +1033,10 @@ export const v5Unit3Test: Assessment = {
         ),
         mc(
           '4-7',
-          'Which gear tooth counts are in the kit?',
-          ['10, 20, 40, and 80', '12, 36, 60, and 84', '15, 30, 45, and 90', '12, 24, 48, and 96'],
-          1,
-          'The kit includes gears with 12, 36, 60, and 84 teeth.'
+          'A 36-tooth gear on the motor shaft drives an 84-tooth gear on the wheel axle. What is the ratio, and which way does it trade?',
+          ['2.33:1, more torque and less speed', '2.33:1, more speed and less torque', '0.43:1, more torque and less speed', '48:1, more torque and less speed'],
+          0,
+          'Driven / driving = 84 / 36 = 2.33:1. A ratio above 1 means the wheel turns more slowly than the motor with more turning force.'
         ),
         mc(
           '4-8',
@@ -1054,7 +1054,7 @@ export const v5Unit3Test: Assessment = {
         ),
         mc(
           '4-10',
-          'Which of these is NOT one of the three friction sources named in the lesson?',
+          'Which of these is NOT a source of friction on a gear-driven axle?',
           ['Metal on metal where a shaft runs in a plain hole', 'Missing spacers letting a gear rub a plate', 'Misaligned shafts making teeth grind', 'A battery below half charge'],
           3,
           'The three sources are metal on metal, missing spacers, and misaligned shafts. Battery charge is not a friction source.'
@@ -1068,7 +1068,7 @@ export const v5Unit3Test: Assessment = {
         ),
         mc(
           '4-12',
-          'What are the four steps of the Engineering Design Process loop, in order?',
+          'You want to know for certain which change made your robot faster. What sequence do you follow?',
           ['Design, build, present, repeat', 'Test, measure, change one thing, re-test', 'Measure, predict, rebuild, race', 'Plan, gear, wire, drive'],
           1,
           'Test the robot on the course, measure and record the exact time, change one thing, then re-test and compare.'
@@ -1082,15 +1082,15 @@ export const v5Unit3Test: Assessment = {
         ),
         mc(
           '4-14',
-          'A team runs the course, makes a change, and comes back slower than before. What does the lesson say to do?',
+          'A team makes a change, re-runs the course, and comes back slower than before. What should they do?',
           ['Discard the run, because only improvements count', 'Log it as a valid result and try a different direction', 'Repeat the same change until it works', 'Return to the original setup and stop iterating'],
           1,
           'The loop does not promise every change helps. Finding that the previous setup was better is still a valid result: log it and try a different direction.'
         ),
         mc(
           '4-15',
-          'Why does the lesson tell you to write down your prediction before making a change?',
-          ['So the instructor can grade the prediction', 'Because a gap between what you expected and what happened is the most useful data you collect', 'Because predictions are required by competition rules', 'So you can skip the re-test if the prediction was right'],
+          'Why is it worth writing down what you expect to happen before you make a change?',
+          ['So the instructor can grade the prediction', 'Because a gap between what you expected and what happened tells you something you did not already know', 'Because it saves you from having to time the run', 'So you can skip the re-test if the prediction was right'],
           1,
           'If the result differs from your prediction, that gap is the most useful data you will collect all day.'
         ),
