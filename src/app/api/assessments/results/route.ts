@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server';
-import { listSubmissions, deleteSubmissions, isDbConfigured } from '@/lib/db';
+import {
+  listSubmissions,
+  deleteSubmissions,
+  setManualScore,
+  isDbConfigured,
+} from '@/lib/db';
+import { v5Assessments } from '@/lib/assessment-data';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -30,6 +36,114 @@ function checkKeyForDelete(searchParams: URLSearchParams): boolean {
 interface DeleteBody {
   assessmentId?: unknown;
   ids?: unknown;
+}
+
+interface MarkBody {
+  assessmentId?: unknown;
+  id?: unknown;
+  questionId?: unknown;
+  points?: unknown;
+}
+
+/**
+ * Records one instructor mark on one short answer.
+ * Body: { assessmentId, id, questionId, points }, where points is a number or
+ * null to clear the mark.
+ *
+ * Like delete, this fails closed when no passcode is configured: marks decide
+ * whether a student passed, so they should never be writable by anyone holding
+ * the link.
+ */
+export async function PATCH(request: Request) {
+  const { searchParams } = new URL(request.url);
+
+  if (!checkKeyForDelete(searchParams)) {
+    return NextResponse.json(
+      { error: 'The instructor passcode is required to save marks.' },
+      { status: 401 }
+    );
+  }
+  if (!isDbConfigured()) {
+    return NextResponse.json(
+      { error: 'Score storage is not configured on the server.' },
+      { status: 503 }
+    );
+  }
+
+  let body: MarkBody;
+  try {
+    body = (await request.json()) as MarkBody;
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body.' }, { status: 400 });
+  }
+
+  const assessmentId =
+    typeof body.assessmentId === 'string' ? body.assessmentId : '';
+  const id =
+    typeof body.id === 'number'
+      ? body.id
+      : typeof body.id === 'string'
+        ? Number(body.id)
+        : NaN;
+  const questionId =
+    typeof body.questionId === 'string' ? body.questionId : '';
+
+  const test = v5Assessments.find((a) => a.id === assessmentId);
+  if (!test) {
+    return NextResponse.json({ error: 'Unknown test.' }, { status: 400 });
+  }
+  if (!Number.isInteger(id) || id <= 0) {
+    return NextResponse.json({ error: 'Invalid response id.' }, { status: 400 });
+  }
+
+  // The question has to be a hand-marked one on this test. That rules out
+  // marks landing on a multiple-choice question, which is scored on submit,
+  // and on a question belonging to some other unit.
+  const question = test.sections
+    .flatMap((s) => s.questions)
+    .find((q) => q.id === questionId && q.kind === 'short-answer');
+  if (!question) {
+    return NextResponse.json(
+      { error: 'That question is not marked by hand on this test.' },
+      { status: 400 }
+    );
+  }
+
+  let points: number | null;
+  if (body.points === null) {
+    points = null;
+  } else if (typeof body.points === 'number' && Number.isFinite(body.points)) {
+    points = body.points;
+    if (points < 0 || points > question.points) {
+      return NextResponse.json(
+        { error: `Marks for this question run from 0 to ${question.points}.` },
+        { status: 400 }
+      );
+    }
+    // Half marks are allowed, finer slices are not.
+    if (Math.round(points * 2) !== points * 2) {
+      return NextResponse.json(
+        { error: 'Marks go in steps of 0.5.' },
+        { status: 400 }
+      );
+    }
+  } else {
+    return NextResponse.json({ error: 'Invalid mark.' }, { status: 400 });
+  }
+
+  try {
+    const manualScores = await setManualScore(assessmentId, id, questionId, points);
+    if (manualScores === null) {
+      return NextResponse.json(
+        { error: 'That response no longer exists.' },
+        { status: 404 }
+      );
+    }
+    return NextResponse.json({ ok: true, manualScores });
+  } catch (err) {
+    console.error('Failed to save mark', err);
+    return NextResponse.json({ error: 'Could not save the mark.' }, { status: 500 });
+  }
 }
 
 /** Removes selected responses. Body: { assessmentId: string, ids: number[] }. */

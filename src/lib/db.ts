@@ -9,6 +9,8 @@ export interface SubmissionRow {
   total_max: number;
   passing_score: number;
   answers: Record<string, number | string>;
+  /** Instructor marks for short answers, keyed by question id. */
+  manual_scores: Record<string, number>;
   created_at: string;
 }
 
@@ -42,6 +44,13 @@ async function ensureTable(): Promise<void> {
       answers       JSONB NOT NULL DEFAULT '{}'::jsonb,
       created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
     )
+  `;
+  // Added after the first cohort had already submitted. Adding a column with a
+  // default cannot touch existing answers or scores: every row that is already
+  // there simply starts out with no marks recorded.
+  await sql`
+    ALTER TABLE assessment_submissions
+    ADD COLUMN IF NOT EXISTS manual_scores JSONB NOT NULL DEFAULT '{}'::jsonb
   `;
   ensured = true;
 }
@@ -86,7 +95,7 @@ export async function listOtherSubmissions(
   await ensureTable();
   const result = await sql.query<SubmissionRow>(
     `SELECT id, name, assessment_id, auto_score, auto_max, total_max,
-            passing_score, answers, created_at
+            passing_score, answers, manual_scores, created_at
      FROM assessment_submissions
      WHERE NOT (assessment_id = ANY($1::text[]))
      ORDER BY created_at DESC`,
@@ -121,10 +130,44 @@ export async function listSubmissions(
   await ensureTable();
   const result = await sql<SubmissionRow>`
     SELECT id, name, assessment_id, auto_score, auto_max, total_max,
-           passing_score, answers, created_at
+           passing_score, answers, manual_scores, created_at
     FROM assessment_submissions
     WHERE assessment_id = ${assessmentId}
     ORDER BY created_at DESC
   `;
   return result.rows;
+}
+
+/**
+ * Records or clears one instructor mark on one submission. Pass null for points
+ * to remove a mark that was entered by mistake, which is not the same as a mark
+ * of zero: zero is a graded answer worth nothing, absent means not yet read.
+ *
+ * Only the one key changes. Marks on the other questions, and the student's own
+ * answers, are never rewritten, so two people marking different questions on
+ * the same paper cannot overwrite each other.
+ */
+export async function setManualScore(
+  assessmentId: string,
+  id: number,
+  questionId: string,
+  points: number | null
+): Promise<Record<string, number> | null> {
+  await ensureTable();
+  const result =
+    points === null
+      ? await sql<{ manual_scores: Record<string, number> }>`
+          UPDATE assessment_submissions
+          SET manual_scores = manual_scores - ${questionId}
+          WHERE id = ${id} AND assessment_id = ${assessmentId}
+          RETURNING manual_scores
+        `
+      : await sql<{ manual_scores: Record<string, number> }>`
+          UPDATE assessment_submissions
+          SET manual_scores =
+            manual_scores || jsonb_build_object(${questionId}::text, ${points}::numeric)
+          WHERE id = ${id} AND assessment_id = ${assessmentId}
+          RETURNING manual_scores
+        `;
+  return result.rows[0]?.manual_scores ?? null;
 }
