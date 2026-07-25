@@ -387,7 +387,7 @@ function SectionForm({
                         className={cn(
                           'flex w-full items-start gap-3 rounded-lg border px-3.5 py-2.5 text-left text-[13.5px] transition-all duration-150',
                           selected
-                            ? 'border-[hsl(153_60%_38%)] bg-[hsl(153_60%_93%)] font-medium text-[hsl(153_45%_18%)] ring-1 ring-inset ring-[hsl(153_60%_38%)]'
+                            ? 'border-[#279B67] bg-[#E2F8EE] font-medium text-[#194330] ring-1 ring-inset ring-[#279B67]'
                             : 'border-border hover:bg-muted/50 active:scale-[0.995]'
                         )}
                       >
@@ -395,7 +395,7 @@ function SectionForm({
                           className={cn(
                             'mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors',
                             selected
-                              ? 'border-[hsl(153_60%_38%)] bg-[hsl(153_60%_38%)]'
+                              ? 'border-[#279B67] bg-[#279B67]'
                               : 'border-muted-foreground/50'
                           )}
                         >
