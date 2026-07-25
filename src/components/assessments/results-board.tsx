@@ -6,6 +6,7 @@ import { Sidebar } from '@/components/layout/sidebar';
 import { Topbar } from '@/components/layout/topbar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { LegacyResponses } from '@/components/assessments/legacy-responses';
 import { cn } from '@/lib/utils';
 import {
   assessmentAutoGradedPoints,
@@ -23,6 +24,7 @@ import {
   Minus,
   RefreshCw,
   Search,
+  Trash2,
   Users,
   X,
 } from 'lucide-react';
@@ -92,6 +94,11 @@ export function ResultsBoard({ test }: { test: Assessment }) {
   const [sort, setSort] = useState<SortKey>('score');
   const [view, setView] = useState<View>('summary');
   const [openStudent, setOpenStudent] = useState<number | null>(null);
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deletedNote, setDeletedNote] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -129,6 +136,10 @@ export function ResultsBoard({ test }: { test: Assessment }) {
   }, [key, test.id]);
 
   useEffect(() => {
+    setSelected(new Set());
+    setConfirmingDelete(false);
+    setDeleteError(null);
+    setDeletedNote(null);
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [test.id]);
@@ -217,6 +228,75 @@ export function ResultsBoard({ test }: { test: Assessment }) {
     () => (openStudent === null ? null : submitted?.find((s) => s.id === openStudent) ?? null),
     [openStudent, submitted]
   );
+
+  /** Selection is scoped to what the search box is currently showing. */
+  const allVisibleSelected = rows.length > 0 && rows.every((r) => selected.has(r.id));
+
+  const toggleRow = useCallback((id: number) => {
+    setDeleteError(null);
+    setConfirmingDelete(false);
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const toggleAllVisible = useCallback(() => {
+    setDeleteError(null);
+    setConfirmingDelete(false);
+    setSelected((prev) => {
+      const next = new Set(prev);
+      const everyOn = rows.length > 0 && rows.every((r) => next.has(r.id));
+      for (const r of rows) {
+        if (everyOn) next.delete(r.id);
+        else next.add(r.id);
+      }
+      return next;
+    });
+  }, [rows]);
+
+  const clearSelection = useCallback(() => {
+    setSelected(new Set());
+    setConfirmingDelete(false);
+    setDeleteError(null);
+  }, []);
+
+  const deleteSelected = useCallback(async () => {
+    const ids = [...selected];
+    if (ids.length === 0) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const params = new URLSearchParams();
+      if (key) params.set('key', key);
+      const res = await fetch(`/api/assessments/results?${params.toString()}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        // Ids arrive from Postgres as strings; send them as numbers.
+        body: JSON.stringify({ assessmentId: test.id, ids: ids.map(Number) }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setDeleteError(data.error || 'Could not delete the selected responses.');
+        return;
+      }
+      // Drop them locally so the table updates even if the reload is slow.
+      setSubmitted((prev) => (prev ? prev.filter((s) => !selected.has(s.id)) : prev));
+      setDeletedNote(
+        `Deleted ${data.deleted} ${data.deleted === 1 ? 'response' : 'responses'}.`
+      );
+      setSelected(new Set());
+      setConfirmingDelete(false);
+      if (openStudent !== null && ids.includes(openStudent)) setOpenStudent(null);
+      load();
+    } catch {
+      setDeleteError('Network error while deleting.');
+    } finally {
+      setDeleting(false);
+    }
+  }, [selected, key, test.id, openStudent, load]);
 
   const exportHref = `/api/assessments/results/export?assessment=${test.id}${
     key ? `&key=${encodeURIComponent(key)}` : ''
@@ -504,11 +584,108 @@ export function ResultsBoard({ test }: { test: Assessment }) {
                 </select>
               </div>
 
+              {/* Selection and delete. Sits above the table so the count and the
+                  action stay in view while scrolling a long list. */}
+              {selected.size > 0 && (
+                <Card style={{ borderColor: confirmingDelete ? '#DC2626' : undefined }}>
+                  <CardContent className="flex flex-wrap items-center justify-between gap-3 pt-6">
+                    {confirmingDelete ? (
+                      <>
+                        <div>
+                          <p className="text-[14px] font-semibold text-red-600">
+                            Delete {selected.size}{' '}
+                            {selected.size === 1 ? 'response' : 'responses'}? This cannot be
+                            undone.
+                          </p>
+                          <p className="text-[12.5px] mt-0.5" style={{ color: MUTED }}>
+                            Download the CSV first if you want a copy.
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setConfirmingDelete(false)}
+                            disabled={deleting}
+                          >
+                            Cancel
+                          </Button>
+                          <button
+                            type="button"
+                            onClick={deleteSelected}
+                            disabled={deleting}
+                            className="flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-[13px] font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                            style={{ background: '#DC2626' }}
+                          >
+                            <Trash2 size={14} />
+                            {deleting ? 'Deleting…' : `Delete ${selected.size}`}
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-[13.5px] font-semibold">
+                          {selected.size} selected
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <Button variant="outline" size="sm" onClick={clearSelection}>
+                            Clear
+                          </Button>
+                          <button
+                            type="button"
+                            onClick={() => setConfirmingDelete(true)}
+                            className="flex items-center gap-1.5 rounded-lg border px-3.5 py-1.5 text-[13px] font-semibold transition-colors hover:bg-red-50"
+                            style={{ borderColor: '#DC2626', color: '#DC2626' }}
+                          >
+                            <Trash2 size={14} />
+                            Delete
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {deleteError && (
+                <Card className="border-red-500/50">
+                  <CardContent className="pt-6 text-[13.5px] text-red-600">
+                    {deleteError}
+                  </CardContent>
+                </Card>
+              )}
+
+              {deletedNote && selected.size === 0 && !confirmingDelete && (
+                <Card>
+                  <CardContent className="flex items-center justify-between gap-3 pt-6 text-[13.5px]">
+                    <span>{deletedNote}</span>
+                    <button
+                      type="button"
+                      onClick={() => setDeletedNote(null)}
+                      className="text-[12px] font-semibold"
+                      style={{ color: MUTED }}
+                    >
+                      Dismiss
+                    </button>
+                  </CardContent>
+                </Card>
+              )}
+
               <Card className="overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-[13.5px]">
                     <thead>
                       <tr className="border-b border-border text-left" style={{ color: MUTED }}>
+                        <th className="w-10 px-4 py-3">
+                          <input
+                            type="checkbox"
+                            checked={allVisibleSelected}
+                            onChange={toggleAllVisible}
+                            aria-label="Select all responses"
+                            className="h-4 w-4 cursor-pointer align-middle"
+                            style={{ accentColor: GREEN }}
+                          />
+                        </th>
                         <th className="px-4 py-3 font-semibold">Name</th>
                         <th className="px-4 py-3 font-semibold">Score</th>
                         <th className="px-4 py-3 font-semibold">%</th>
@@ -528,6 +705,17 @@ export function ResultsBoard({ test }: { test: Assessment }) {
                             className="border-b border-border/60 last:border-0 cursor-pointer hover:bg-[#F4F4F5]"
                             onClick={() => setOpenStudent(s.id)}
                           >
+                            {/* Ticking a box must not also open the paper. */}
+                            <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                              <input
+                                type="checkbox"
+                                checked={selected.has(s.id)}
+                                onChange={() => toggleRow(s.id)}
+                                aria-label={`Select ${s.name}`}
+                                className="h-4 w-4 cursor-pointer align-middle"
+                                style={{ accentColor: GREEN }}
+                              />
+                            </td>
                             <td className="px-4 py-3 font-medium">{s.name}</td>
                             <td className="px-4 py-3 tabular-nums">
                               {s.auto_score} / {s.auto_max}
@@ -674,6 +862,9 @@ export function ResultsBoard({ test }: { test: Assessment }) {
               </div>
             </>
           )}
+
+          {/* Shown on the first unit only, so the cleanup block appears once. */}
+          {!needsKey && test.id === v5Assessments[0].id && <LegacyResponses passcode={key} />}
 
           <p className="text-[12px]" style={{ color: MUTED }}>
             &ldquo;Result (auto)&rdquo; compares multiple-choice points against {autoBar} of{' '}

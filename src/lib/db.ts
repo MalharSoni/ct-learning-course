@@ -75,6 +75,46 @@ export async function insertSubmission(sub: NewSubmission): Promise<number> {
   return result.rows[0].id;
 }
 
+/**
+ * Rows left behind by tests that no longer exist, such as the combined V5
+ * Foundation test before it was split per unit. Nothing else lists these, so
+ * without this they would sit in the table forever with no way to clear them.
+ */
+export async function listOtherSubmissions(
+  knownAssessmentIds: string[]
+): Promise<SubmissionRow[]> {
+  await ensureTable();
+  const result = await sql.query<SubmissionRow>(
+    `SELECT id, name, assessment_id, auto_score, auto_max, total_max,
+            passing_score, answers, created_at
+     FROM assessment_submissions
+     WHERE NOT (assessment_id = ANY($1::text[]))
+     ORDER BY created_at DESC`,
+    [knownAssessmentIds]
+  );
+  return result.rows;
+}
+
+/**
+ * Permanently removes the given submissions. Scoped to one assessment as well
+ * as the ids, so a stale id from another unit cannot be deleted by accident.
+ * Returns how many rows actually went, which may be fewer than the ids asked
+ * for if someone already deleted them in another tab.
+ */
+export async function deleteSubmissions(
+  assessmentId: string,
+  ids: number[]
+): Promise<number> {
+  await ensureTable();
+  if (ids.length === 0) return 0;
+  const result = await sql.query(
+    `DELETE FROM assessment_submissions
+     WHERE assessment_id = $1 AND id = ANY($2::bigint[])`,
+    [assessmentId, ids]
+  );
+  return result.rowCount ?? 0;
+}
+
 export async function listSubmissions(
   assessmentId: string
 ): Promise<SubmissionRow[]> {
