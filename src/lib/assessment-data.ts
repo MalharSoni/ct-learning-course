@@ -441,7 +441,7 @@ export const v5Unit1Test: Assessment = {
           'What does choosing a drawing template set up for you?',
           ['The sheet size, the title block, and the units', 'The material the part is made from', 'Which views appear on the sheet', 'The scale the part will be printed at'],
           0,
-          'A template sets the sheet size, title block, and units before you place a single view. ANSI templates are usually inches and ISO templates are usually millimetres.'
+          'A template sets the sheet size, title block, and units before you place a single view. ANSI templates are the ones set up in inches.'
         ),
         mc(
           '4-5',
@@ -473,10 +473,10 @@ export const v5Unit1Test: Assessment = {
         ),
         mc(
           '4-9',
-          'A drawing tags the same hole twice, once as 8 mm and once as 7.5 mm. What is this called and why is it a problem?',
+          'A drawing tags the same hole twice, once as 0.25 in and once as 0.20 in. What is this called and why is it a problem?',
           ['Under-dimensioned; the maker has to guess the size', 'Over-dimensioned; the maker cannot tell which number to trust', 'Correctly dimensioned; two views need two numbers', 'A scale error; the numbers are both right at different scales'],
           1,
-          'Over-dimensioned means a feature is dimensioned more than once, producing conflicting values. The maker cannot tell which to trust and one of the parts comes out wrong.'
+          'Over-dimensioned means a feature is dimensioned more than once, producing two values that disagree. The maker cannot tell which to trust, so the part comes out wrong.'
         ),
         mc(
           '4-10',
@@ -789,9 +789,9 @@ export const v5Unit3Test: Assessment = {
         mc(
           '2-6',
           'How do you verify that a frame is square?',
-          ['Use a protractor on each corner', 'Measure both diagonals and confirm they are within 2 mm of each other', 'Eyeball it from above and check the rails look parallel', 'Weigh each side and confirm they are equal'],
+          ['Use a protractor on each corner', 'Measure both diagonals and confirm they are within 1/16 in of each other', 'Eyeball it from above and check the rails look parallel', 'Weigh each side and confirm they are equal'],
           1,
-          'Equal diagonals prove 90-degree corners. Eyeballing is not accurate enough: a frame can look parallel while being 6 to 8 mm out of square.'
+          'Equal diagonals prove 90-degree corners. Eyeballing is not accurate enough: a frame can look parallel while sitting a quarter inch out of square.'
         ),
         mc(
           '2-7',
@@ -802,15 +802,15 @@ export const v5Unit3Test: Assessment = {
         ),
         mc(
           '2-8',
-          'You measure a drive frame’s two diagonals and get 314 mm and 310 mm. Is the frame square?',
-          ['Yes, because both numbers start with 31', 'No, the 4 mm difference exceeds the 2 mm pass bar, so nudge the frame and re-measure', 'Yes, any difference under 10 mm passes', 'It cannot be determined without a protractor'],
+          'You measure a drive frame’s two diagonals and get 15 1/4 in and 15 1/8 in. Is the frame square?',
+          ['Yes, because both measurements are over 15 in', 'No, the 1/8 in difference is more than the 1/16 in pass bar, so nudge the frame and re-measure', 'Yes, any difference under half an inch passes', 'It cannot be determined without a protractor'],
           1,
-          'The pass bar is both diagonals within 2 mm of each other. A 4 mm difference fails, so loosen the cross-brace bolts, nudge, snug, and measure again.'
+          'The pass bar is both diagonals within 1/16 in of each other. A 1/8 in difference is double that, so loosen the cross-brace bolts, nudge, snug, and measure again.'
         ),
         mc(
           '2-9',
           'When should you fully tighten the frame bolts?',
-          ['Before measuring the diagonals, so nothing shifts', 'Only after the diagonals pass the 2 mm bar', 'Halfway through, then re-measure', 'It does not matter when'],
+          ['Before measuring the diagonals, so nothing shifts', 'Only after the diagonals pass the 1/16 in bar', 'Halfway through, then re-measure', 'It does not matter when'],
           1,
           'Snug the bolts enough to hold position, check the diagonals, nudge if needed, then tighten completely. Do not fully tighten any bolt before the frame passes.'
         ),
@@ -854,14 +854,14 @@ export const v5Unit3Test: Assessment = {
           id: '2-15',
           prompt: 'Describe the process for squaring a drive frame using diagonal measurement, including the pass bar and what to do if the two diagonals do not match.',
           points: 4,
-          modelAnswer: 'Measure diagonal 1 (front-left to back-right) and diagonal 2 (front-right to back-left). Compare them. If they differ by more than 2 mm, loosen the cross-brace bolts, nudge the frame, snug the bolts, and measure again. Repeat until both diagonals are within 2 mm, then fully tighten every bolt. Do not fully tighten any bolt before the frame passes.',
+          modelAnswer: 'Measure diagonal 1 (front-left to back-right) and diagonal 2 (front-right to back-left). Compare them. If they differ by more than 1/16 in, loosen the cross-brace bolts, nudge the frame, snug the bolts, and measure again. Repeat until both diagonals are within 1/16 in, then fully tighten every bolt. Do not fully tighten any bolt before the frame passes.',
         },
         {
           kind: 'short-answer',
           id: '2-16',
           prompt: 'A teammate says their frame is fine because it "looks square and feels solid". Explain why that is not good enough, and give the two separate checks that would actually prove the frame is ready, naming what each one measures.',
           points: 4,
-          modelAnswer: 'Looking square is not accurate enough: a frame can look parallel while being 6 to 8 mm out of square, and an out-of-square frame makes the robot track crooked no matter what the code says. The two checks are (1) the diagonal measurement, which proves the corners are at 90 degrees when both diagonals are within 2 mm of each other, and (2) the push and drop tests, which prove rigidity and that nothing is loose: pressing each corner toward the opposite corner should produce no spreading, creaking, or clicking, and setting the robot down and shaking it should produce no rattles or wobbling wheels.',
+          modelAnswer: 'Looking square is not accurate enough: a frame can look parallel while sitting a quarter inch out of square, and an out-of-square frame makes the robot track crooked no matter what the code says. The two checks are (1) the diagonal measurement, which proves the corners are at 90 degrees when both diagonals are within 1/16 in of each other, and (2) the push and drop tests, which prove rigidity and that nothing is loose: pressing each corner toward the opposite corner should produce no spreading, creaking, or clicking, and setting the robot down and shaking it should produce no rattles or wobbling wheels.',
         },
       ],
     },
