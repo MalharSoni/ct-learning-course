@@ -989,3 +989,48 @@ export function assessmentAutoGradedPoints(assessment: Assessment): number {
 export function assessmentQuestionCount(assessment: Assessment): number {
   return assessment.sections.reduce((sum, s) => sum + s.questions.length, 0);
 }
+
+/** The questions an instructor has to read and mark, in the order they appear. */
+export function assessmentShortAnswers(
+  assessment: Assessment
+): ShortAnswerQuestion[] {
+  return assessment.sections
+    .flatMap((s) => s.questions)
+    .filter((q): q is ShortAnswerQuestion => q.kind === 'short-answer');
+}
+
+/** Points available on the hand-marked questions. */
+export function assessmentWrittenPoints(assessment: Assessment): number {
+  return assessmentShortAnswers(assessment).reduce((sum, q) => sum + q.points, 0);
+}
+
+/**
+ * Marks entered so far, ignoring anything keyed to a question that is no longer
+ * on the test. A mark of zero counts as marked; a missing key does not.
+ */
+export function writtenScore(
+  assessment: Assessment,
+  manual: Record<string, number> | null | undefined
+): { total: number; marked: number; of: number; complete: boolean } {
+  const questions = assessmentShortAnswers(assessment);
+  let total = 0;
+  let marked = 0;
+  for (const q of questions) {
+    const v = manual?.[q.id];
+    if (typeof v === 'number' && Number.isFinite(v)) {
+      total += v;
+      marked++;
+    }
+  }
+  return {
+    total,
+    marked,
+    of: questions.length,
+    complete: questions.length > 0 && marked === questions.length,
+  };
+}
+
+/** Trims a score for display so 4 shows as "4" and 4.5 shows as "4.5". */
+export function formatPoints(value: number): string {
+  return Number.isInteger(value) ? String(value) : value.toFixed(1);
+}

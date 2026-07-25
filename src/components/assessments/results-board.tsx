@@ -10,7 +10,11 @@ import { LegacyResponses } from '@/components/assessments/legacy-responses';
 import { cn } from '@/lib/utils';
 import {
   assessmentAutoGradedPoints,
+  assessmentShortAnswers,
+  assessmentWrittenPoints,
+  formatPoints,
   v5Assessments,
+  writtenScore,
   type Assessment,
   type AssessmentQuestion,
 } from '@/lib/assessment-data';
@@ -37,11 +41,13 @@ interface Submission {
   total_max: number;
   passing_score: number;
   answers: Record<string, number | string>;
+  manual_scores: Record<string, number> | null;
   created_at: string;
 }
 
-type SortKey = 'score' | 'name' | 'date';
+type SortKey = 'score' | 'name' | 'date' | 'unmarked';
 type View = 'summary' | 'questions' | 'people';
+type SaveState = 'saving' | 'saved' | 'error';
 
 /** Explicit colours: this app's theme tokens do not resolve, so bg-accent and
  *  friends render as nothing. Anything that must be visible is stated here. */
@@ -59,7 +65,9 @@ interface QuestionStat {
   correct: number;
   correctPct: number;
   optionCounts: number[];
-  texts: { name: string; text: string }[];
+  texts: { id: number; name: string; text: string }[];
+  /** Short answers only: how many of the written answers carry a mark. */
+  marked: number;
 }
 
 /**
@@ -85,6 +93,23 @@ export function ResultsBoard({ test }: { test: Assessment }) {
     [autoMax, test.passingScore, test.totalPoints]
   );
 
+  const writtenMax = useMemo(() => assessmentWrittenPoints(test), [test]);
+  const shortAnswers = useMemo(() => assessmentShortAnswers(test), [test]);
+
+  /** One student's standing: auto score, marks entered, and the final result. */
+  const scoreOf = useCallback(
+    (s: Submission) => {
+      const written = writtenScore(test, s.manual_scores);
+      return {
+        ...written,
+        auto: s.auto_score,
+        final: s.auto_score + written.total,
+        passed: s.auto_score + written.total >= test.passingScore,
+      };
+    },
+    [test]
+  );
+
   const [key, setKey] = useState('');
   const [submitted, setSubmitted] = useState<Submission[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -99,6 +124,8 @@ export function ResultsBoard({ test }: { test: Assessment }) {
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deletedNote, setDeletedNote] = useState<string | null>(null);
+  const [saving, setSaving] = useState<Record<string, SaveState>>({});
+  const [markError, setMarkError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -152,18 +179,47 @@ export function ResultsBoard({ test }: { test: Assessment }) {
     [test]
   );
 
+  /**
+   * Until the written answers are marked there is no final score, so the
+   * summary reports on whichever basis is honest: finished papers once any
+   * exist, and the multiple-choice pace before that.
+   */
   const stats = useMemo(() => {
     if (!submitted || submitted.length === 0) return null;
-    const scores = submitted.map((s) => s.auto_score);
+    const finished = submitted.map(scoreOf).filter((r) => r.complete);
+
+    if (finished.length > 0) {
+      const avg =
+        finished.reduce((sum, r) => sum + r.final, 0) / finished.length;
+      const passed = finished.filter((r) => r.passed).length;
+      return {
+        basis: 'final' as const,
+        count: submitted.length,
+        marked: finished.length,
+        avg: test.totalPoints > 0 ? Math.round((avg / test.totalPoints) * 100) : 0,
+        passed,
+        passRate: Math.round((passed / finished.length) * 100),
+      };
+    }
+
+    const avg =
+      submitted.reduce((sum, s) => sum + s.auto_score, 0) / submitted.length;
     const passed = submitted.filter((s) => s.auto_score >= autoBar).length;
-    const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
     return {
+      basis: 'auto' as const,
       count: submitted.length,
+      marked: 0,
       avg: autoMax > 0 ? Math.round((avg / autoMax) * 100) : 0,
       passed,
       passRate: Math.round((passed / submitted.length) * 100),
     };
-  }, [submitted, autoMax, autoBar]);
+  }, [submitted, autoMax, autoBar, scoreOf, test.totalPoints]);
+
+  /** How many papers are completely marked, for the marking-progress tile. */
+  const fullyMarked = useMemo(
+    () => (submitted ?? []).filter((s) => scoreOf(s).complete).length,
+    [submitted, scoreOf]
+  );
 
   /** Per-question tallies across every submission. */
   const questionStats = useMemo<QuestionStat[]>(() => {
@@ -171,9 +227,10 @@ export function ResultsBoard({ test }: { test: Assessment }) {
     return flatQuestions.map(({ question, sectionTitle }, i) => {
       let answered = 0;
       let correct = 0;
+      let marked = 0;
       const optionCounts =
         question.kind === 'multiple-choice' ? question.options.map(() => 0) : [];
-      const texts: { name: string; text: string }[] = [];
+      const texts: { id: number; name: string; text: string }[] = [];
 
       for (const s of subs) {
         const a = s.answers?.[question.id];
@@ -183,9 +240,13 @@ export function ResultsBoard({ test }: { test: Assessment }) {
             optionCounts[a]++;
             if (a === question.correctIndex) correct++;
           }
-        } else if (typeof a === 'string' && a.trim()) {
-          answered++;
-          texts.push({ name: s.name, text: a.trim() });
+        } else {
+          // Skipped written answers still need a mark of zero recorded, so
+          // every paper is listed here, not only the ones with text in them.
+          const text = typeof a === 'string' ? a.trim() : '';
+          if (text) answered++;
+          texts.push({ id: s.id, name: s.name, text });
+          if (typeof s.manual_scores?.[question.id] === 'number') marked++;
         }
       }
 
@@ -199,6 +260,7 @@ export function ResultsBoard({ test }: { test: Assessment }) {
         correctPct: answered > 0 ? Math.round((correct / answered) * 100) : 0,
         optionCounts,
         texts,
+        marked,
       };
     });
   }, [flatQuestions, submitted]);
@@ -218,11 +280,19 @@ export function ResultsBoard({ test }: { test: Assessment }) {
       s.name.toLowerCase().includes(query.trim().toLowerCase())
     );
     const sorted = [...filtered];
-    if (sort === 'score') sorted.sort((a, b) => b.auto_score - a.auto_score);
+    if (sort === 'score')
+      sorted.sort((a, b) => scoreOf(b).final - scoreOf(a).final);
     else if (sort === 'name') sorted.sort((a, b) => a.name.localeCompare(b.name));
+    else if (sort === 'unmarked')
+      // Marking queue: papers with the most left to mark come first.
+      sorted.sort(
+        (a, b) =>
+          scoreOf(a).marked - scoreOf(b).marked ||
+          a.name.localeCompare(b.name)
+      );
     else sorted.sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at));
     return sorted;
-  }, [submitted, query, sort]);
+  }, [submitted, query, sort, scoreOf]);
 
   const student = useMemo(
     () => (openStudent === null ? null : submitted?.find((s) => s.id === openStudent) ?? null),
@@ -298,6 +368,68 @@ export function ResultsBoard({ test }: { test: Assessment }) {
     }
   }, [selected, key, test.id, openStudent, load]);
 
+  /**
+   * Saves one mark. The row updates on screen first so marking never waits on
+   * the network, and rolls back with a message if the save is refused.
+   */
+  const saveMark = useCallback(
+    async (
+      submissionId: number,
+      questionId: string,
+      points: number | null,
+      /** The mark before this edit, so a refused save can put it back. */
+      previousPoints: number | undefined
+    ) => {
+      const slot = `${submissionId}:${questionId}`;
+
+      // Rewriting one key is idempotent, so it does not matter how many times
+      // React replays this updater.
+      const applyMark = (value: number | null) => (prev: Submission[] | null) => {
+        if (!prev) return prev;
+        return prev.map((s) => {
+          if (s.id !== submissionId) return s;
+          const next = { ...(s.manual_scores ?? {}) };
+          if (value === null) delete next[questionId];
+          else next[questionId] = value;
+          return { ...s, manual_scores: next };
+        });
+      };
+      const rollback = applyMark(previousPoints ?? null);
+
+      setSubmitted(applyMark(points));
+      setSaving((prev) => ({ ...prev, [slot]: 'saving' }));
+
+      try {
+        const params = new URLSearchParams();
+        if (key) params.set('key', key);
+        const res = await fetch(`/api/assessments/results?${params.toString()}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            assessmentId: test.id,
+            id: Number(submissionId),
+            questionId,
+            points,
+          }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          setSubmitted(rollback);
+          setSaving((prev) => ({ ...prev, [slot]: 'error' }));
+          setMarkError(data.error || 'Could not save that mark.');
+          return;
+        }
+        setSaving((prev) => ({ ...prev, [slot]: 'saved' }));
+        setMarkError(null);
+      } catch {
+        setSubmitted(rollback);
+        setSaving((prev) => ({ ...prev, [slot]: 'error' }));
+        setMarkError('Network error while saving that mark.');
+      }
+    },
+    [key, test.id]
+  );
+
   const exportHref = `/api/assessments/results/export?assessment=${test.id}${
     key ? `&key=${encodeURIComponent(key)}` : ''
   }`;
@@ -315,8 +447,8 @@ export function ResultsBoard({ test }: { test: Assessment }) {
               {test.unitLabel} Test Results
             </h1>
             <p className="text-[14px] mt-1" style={{ color: MUTED }}>
-              {test.title}. Multiple choice is scored automatically ({autoMax} pts). Short answers
-              are shown here for you to read and grade by hand.
+              {test.title}. Multiple choice is scored automatically ({autoMax} pts). Type a mark
+              on each short answer ({writtenMax} pts) and it is added to the final score.
             </p>
           </div>
 
@@ -367,6 +499,22 @@ export function ResultsBoard({ test }: { test: Assessment }) {
           {error && !needsKey && (
             <Card className="border-red-500/50">
               <CardContent className="pt-6 text-[13.5px] text-red-600">{error}</CardContent>
+            </Card>
+          )}
+
+          {markError && (
+            <Card className="border-red-500/50">
+              <CardContent className="flex items-center justify-between gap-3 pt-6 text-[13.5px] text-red-600">
+                <span>{markError}</span>
+                <button
+                  type="button"
+                  onClick={() => setMarkError(null)}
+                  className="text-[12px] font-semibold"
+                  style={{ color: MUTED }}
+                >
+                  Dismiss
+                </button>
+              </CardContent>
             </Card>
           )}
 
@@ -426,9 +574,21 @@ export function ResultsBoard({ test }: { test: Assessment }) {
             <>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <StatTile icon={<Users size={15} />} label="Responses" value={`${stats.count}`} />
-                <StatTile label="Average" value={`${stats.avg}%`} />
-                <StatTile label="On track" value={`${stats.passed}`} />
-                <StatTile label="Pass rate" value={`${stats.passRate}%`} />
+                <StatTile
+                  label="Marked"
+                  value={`${fullyMarked} / ${stats.count}`}
+                  note={fullyMarked === stats.count ? 'all done' : 'papers finished'}
+                />
+                <StatTile
+                  label="Average"
+                  value={`${stats.avg}%`}
+                  note={stats.basis === 'final' ? 'of marked papers' : 'multiple choice only'}
+                />
+                <StatTile
+                  label={stats.basis === 'final' ? 'Pass rate' : 'On pace'}
+                  value={`${stats.passRate}%`}
+                  note={stats.basis === 'final' ? `${stats.passed} passed` : 'before marking'}
+                />
               </div>
 
               <Card>
@@ -489,8 +649,15 @@ export function ResultsBoard({ test }: { test: Assessment }) {
                           {q.correctPct}% correct
                         </span>
                       ) : (
-                        <span className="shrink-0 text-[12px]" style={{ color: MUTED }}>
-                          Graded by hand
+                        <span
+                          className="shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+                          style={
+                            q.marked > 0 && q.marked === q.texts.length
+                              ? { background: GREEN_SOFT, color: '#194330' }
+                              : { background: '#F4F4F5', color: MUTED }
+                          }
+                        >
+                          {q.marked} of {q.texts.length} marked
                         </span>
                       )}
                     </div>
@@ -528,22 +695,50 @@ export function ResultsBoard({ test }: { test: Assessment }) {
                       </div>
                     ) : (
                       <div className="space-y-2">
+                        <details className="text-[13px]">
+                          <summary
+                            className="cursor-pointer font-semibold"
+                            style={{ color: MUTED }}
+                          >
+                            Model answer
+                          </summary>
+                          <p className="mt-1.5 whitespace-pre-wrap" style={{ color: MUTED }}>
+                            {qq.modelAnswer}
+                          </p>
+                        </details>
+
                         {q.texts.length === 0 && (
                           <p className="text-[13px]" style={{ color: MUTED }}>
-                            No written answers yet.
+                            No responses yet.
                           </p>
                         )}
-                        {q.texts.map((t, i) => (
-                          <div
-                            key={i}
-                            className="rounded-lg border border-border p-3 text-[13.5px]"
-                          >
-                            <div className="text-[12px] font-semibold" style={{ color: MUTED }}>
-                              {t.name}
+                        {q.texts.map((t) => {
+                          const sub = submitted?.find((s) => s.id === t.id);
+                          return (
+                            <div
+                              key={t.id}
+                              className="rounded-lg border border-border p-3 text-[13.5px]"
+                            >
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="text-[12px] font-semibold" style={{ color: MUTED }}>
+                                  {t.name}
+                                </div>
+                                <MarkInput
+                                  value={sub?.manual_scores?.[qq.id]}
+                                  max={qq.points}
+                                  state={saving[`${t.id}:${qq.id}`]}
+                                  label={`Mark for ${t.name} on question ${q.number}`}
+                                  onSave={(points) => saveMark(t.id, qq.id, points, sub?.manual_scores?.[qq.id])}
+                                />
+                              </div>
+                              <p className="mt-1 whitespace-pre-wrap">
+                                {t.text || (
+                                  <span style={{ color: MUTED }}>Skipped, nothing written</span>
+                                )}
+                              </p>
                             </div>
-                            <p className="mt-1 whitespace-pre-wrap">{t.text}</p>
-                          </div>
-                        ))}
+                          );
+                        })}
                         <p className="text-[12px]" style={{ color: MUTED }}>
                           {q.answered} answered, {q.skipped} skipped
                         </p>
@@ -579,6 +774,7 @@ export function ResultsBoard({ test }: { test: Assessment }) {
                   className="rounded-lg border border-border bg-background px-3 py-2 text-[13px] outline-none"
                 >
                   <option value="score">Sort: Score (high to low)</option>
+                  <option value="unmarked">Sort: Still to mark</option>
                   <option value="name">Sort: Name (A to Z)</option>
                   <option value="date">Sort: Newest</option>
                 </select>
@@ -687,17 +883,25 @@ export function ResultsBoard({ test }: { test: Assessment }) {
                           />
                         </th>
                         <th className="px-4 py-3 font-semibold">Name</th>
-                        <th className="px-4 py-3 font-semibold">Score</th>
+                        <th className="px-4 py-3 font-semibold">Auto</th>
+                        <th className="px-4 py-3 font-semibold">Written</th>
+                        <th className="px-4 py-3 font-semibold">Final</th>
                         <th className="px-4 py-3 font-semibold">%</th>
-                        <th className="px-4 py-3 font-semibold">Result (auto)</th>
+                        <th className="px-4 py-3 font-semibold">Result</th>
                         <th className="px-4 py-3 font-semibold">Submitted</th>
                         <th className="px-4 py-3 font-semibold" />
                       </tr>
                     </thead>
                     <tbody>
                       {rows.map((s) => {
-                        const pct =
-                          s.auto_max > 0 ? Math.round((s.auto_score / s.auto_max) * 100) : 0;
+                        const r = scoreOf(s);
+                        // Before a paper is fully marked its percentage is not
+                        // a result yet, so it is shown against the auto part.
+                        const pct = r.complete
+                          ? Math.round((r.final / test.totalPoints) * 100)
+                          : s.auto_max > 0
+                            ? Math.round((s.auto_score / s.auto_max) * 100)
+                            : 0;
                         const onTrack = s.auto_score >= autoBar;
                         return (
                           <tr
@@ -720,18 +924,50 @@ export function ResultsBoard({ test }: { test: Assessment }) {
                             <td className="px-4 py-3 tabular-nums">
                               {s.auto_score} / {s.auto_max}
                             </td>
+                            <td className="px-4 py-3 tabular-nums">
+                              {r.marked === 0 ? (
+                                <span style={{ color: MUTED }}>not marked</span>
+                              ) : (
+                                <span style={{ color: r.complete ? undefined : MUTED }}>
+                                  {formatPoints(r.total)} / {writtenMax}
+                                  {!r.complete && ` (${r.marked} of ${r.of})`}
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 tabular-nums font-semibold">
+                              {r.complete ? (
+                                `${formatPoints(r.final)} / ${test.totalPoints}`
+                              ) : (
+                                <span className="font-normal" style={{ color: MUTED }}>
+                                  &ndash;
+                                </span>
+                              )}
+                            </td>
                             <td className="px-4 py-3 tabular-nums">{pct}%</td>
                             <td className="px-4 py-3">
-                              <span
-                                className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
-                                style={
-                                  onTrack
-                                    ? { background: GREEN_SOFT, color: '#194330' }
-                                    : { background: '#FEF3C7', color: '#92400E' }
-                                }
-                              >
-                                {onTrack ? 'On track' : 'Below pace'}
-                              </span>
+                              {r.complete ? (
+                                <span
+                                  className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+                                  style={
+                                    r.passed
+                                      ? { background: GREEN_SOFT, color: '#194330' }
+                                      : { background: '#FEE2E2', color: '#991B1B' }
+                                  }
+                                >
+                                  {r.passed ? 'Pass' : 'Fail'}
+                                </span>
+                              ) : (
+                                <span
+                                  className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+                                  style={
+                                    onTrack
+                                      ? { background: '#F4F4F5', color: '#52525B' }
+                                      : { background: '#FEF3C7', color: '#92400E' }
+                                  }
+                                >
+                                  {onTrack ? 'To mark' : 'To mark, below pace'}
+                                </span>
+                              )}
                             </td>
                             <td className="px-4 py-3" style={{ color: MUTED }}>
                               {new Date(s.created_at).toLocaleString()}
@@ -769,25 +1005,39 @@ export function ResultsBoard({ test }: { test: Assessment }) {
                 <CardHeader>
                   <CardTitle className="text-[20px]">{student.name}</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                    <StatTile
-                      label="Auto score"
-                      value={`${student.auto_score} / ${student.auto_max}`}
-                    />
-                    <StatTile
-                      label="Percent"
-                      value={`${
-                        student.auto_max > 0
-                          ? Math.round((student.auto_score / student.auto_max) * 100)
-                          : 0
-                      }%`}
-                    />
-                    <StatTile
-                      label="Short answers to grade"
-                      value={`${test.totalPoints - autoMax} pts`}
-                    />
-                  </div>
+                <CardContent className="space-y-3">
+                  {(() => {
+                    const r = scoreOf(student);
+                    return (
+                      <>
+                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                          <StatTile
+                            label="Multiple choice"
+                            value={`${student.auto_score} / ${autoMax}`}
+                          />
+                          <StatTile
+                            label="Written"
+                            value={`${formatPoints(r.total)} / ${writtenMax}`}
+                            note={r.complete ? 'all marked' : `${r.marked} of ${r.of} marked`}
+                          />
+                          <StatTile
+                            label="Final"
+                            value={
+                              r.complete
+                                ? `${formatPoints(r.final)} / ${test.totalPoints}`
+                                : '–'
+                            }
+                            note={r.complete ? undefined : 'mark every written answer'}
+                          />
+                          <StatTile
+                            label="Result"
+                            value={r.complete ? (r.passed ? 'Pass' : 'Fail') : '–'}
+                            note={`pass mark ${test.passingScore}`}
+                          />
+                        </div>
+                      </>
+                    );
+                  })()}
                 </CardContent>
               </Card>
 
@@ -837,12 +1087,13 @@ export function ResultsBoard({ test }: { test: Assessment }) {
                           <p className="text-[14px] font-medium">
                             {q.number}. {qq.prompt}
                           </p>
-                          <span
-                            className="shrink-0 text-[12px] font-semibold"
-                            style={{ color: MUTED }}
-                          >
-                            {qq.points} pts
-                          </span>
+                          <MarkInput
+                            value={student.manual_scores?.[qq.id]}
+                            max={qq.points}
+                            state={saving[`${student.id}:${qq.id}`]}
+                            label={`Mark for question ${q.number}`}
+                            onSave={(points) => saveMark(student.id, qq.id, points, student.manual_scores?.[qq.id])}
+                          />
                         </div>
                         <div className="rounded-lg border border-border p-3 text-[13.5px] whitespace-pre-wrap">
                           {text || <span style={{ color: MUTED }}>Skipped</span>}
@@ -867,10 +1118,11 @@ export function ResultsBoard({ test }: { test: Assessment }) {
           {!needsKey && test.id === v5Assessments[0].id && <LegacyResponses passcode={key} />}
 
           <p className="text-[12px]" style={{ color: MUTED }}>
-            &ldquo;Result (auto)&rdquo; compares multiple-choice points against {autoBar} of{' '}
-            {autoMax}, the same percentage pace as the {test.passingScore}-point cutoff for the
-            whole test. It is not the final result: the {test.totalPoints - autoMax} short-answer
-            points you grade by hand still count.
+            A paper gets a final result once all {shortAnswers.length} written answers carry a
+            mark. Until then it reads &ldquo;To mark&rdquo;, and &ldquo;below pace&rdquo; means the
+            multiple-choice score is under {autoBar} of {autoMax}, the same percentage pace as the{' '}
+            {test.passingScore}-point cutoff. Marks save as you type them. An empty box means not
+            yet read, which is not the same as a mark of 0.
           </p>
         </div>
       </main>
@@ -922,10 +1174,12 @@ function StatTile({
   icon,
   label,
   value,
+  note,
 }: {
   icon?: React.ReactNode;
   label: string;
   value: string;
+  note?: string;
 }) {
   return (
     <div className="rounded-lg border border-border p-3" style={{ background: '#FAFAFA' }}>
@@ -937,6 +1191,95 @@ function StatTile({
         {label}
       </div>
       <div className="mt-1 text-[22px] font-black tracking-tight">{value}</div>
+      {note && (
+        <div className="text-[11.5px] leading-tight" style={{ color: MUTED }}>
+          {note}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * The mark box for one written answer on one paper. Whole and half marks only,
+ * typed or stepped, saved as soon as the value settles. An empty box means the
+ * answer has not been read yet, which is deliberately different from a 0.
+ */
+function MarkInput({
+  value,
+  max,
+  state,
+  onSave,
+  label,
+}: {
+  value: number | undefined;
+  max: number;
+  state?: SaveState;
+  onSave: (points: number | null) => void;
+  label: string;
+}) {
+  const [draft, setDraft] = useState(value === undefined ? '' : String(value));
+
+  // Follow the stored value when it changes elsewhere, such as a reload or the
+  // same paper being marked from the other tab.
+  useEffect(() => {
+    setDraft(value === undefined ? '' : String(value));
+  }, [value]);
+
+  const commit = useCallback(
+    (raw: string) => {
+      const trimmed = raw.trim();
+      if (trimmed === '') {
+        if (value !== undefined) onSave(null);
+        return;
+      }
+      const n = Number(trimmed);
+      if (!Number.isFinite(n)) {
+        setDraft(value === undefined ? '' : String(value));
+        return;
+      }
+      const clamped = Math.min(Math.max(Math.round(n * 2) / 2, 0), max);
+      setDraft(String(clamped));
+      if (clamped !== value) onSave(clamped);
+    },
+    [max, onSave, value]
+  );
+
+  const marked = value !== undefined;
+
+  return (
+    <div className="flex shrink-0 items-center gap-2">
+      <input
+        type="number"
+        inputMode="decimal"
+        min={0}
+        max={max}
+        step={0.5}
+        value={draft}
+        aria-label={label}
+        placeholder="–"
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={(e) => commit(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+        }}
+        className="w-[62px] rounded-lg border px-2 py-1.5 text-center text-[14px] font-semibold tabular-nums outline-none focus:border-[#279B67]"
+        style={{
+          borderColor: marked ? GREEN : '#D4D4D8',
+          background: marked ? GREEN_SOFT : '#FFFFFF',
+          color: marked ? '#194330' : undefined,
+        }}
+      />
+      <span className="text-[12.5px] whitespace-nowrap" style={{ color: MUTED }}>
+        / {max}
+      </span>
+      <span className="w-[14px] shrink-0">
+        {state === 'saving' && (
+          <RefreshCw size={13} className="animate-spin" style={{ color: MUTED }} />
+        )}
+        {state === 'saved' && <Check size={14} style={{ color: GREEN }} />}
+        {state === 'error' && <X size={14} style={{ color: '#DC2626' }} />}
+      </span>
     </div>
   );
 }
