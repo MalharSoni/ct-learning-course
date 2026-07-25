@@ -55,10 +55,10 @@ export const v5Unit1Test: Assessment = {
   unitLabel: 'Unit 1',
   title: 'V5 Foundation — Unit 1 Test: Onshape CAD',
   description:
-    'This test covers Unit 1 of the V5 Foundation Program, one section per lesson: sketching basics, sketch tools and constraints, assemblies and mates, and engineering drawings, plus a short section on designing a part to be 3D printed. Multiple choice questions are graded automatically; short answer questions are reviewed by your instructor.',
-  totalPoints: 83,
-  passingScore: 66,
-  timeLimitMinutes: 75,
+    'This test covers Unit 1 of the V5 Foundation Program, one section per lesson: sketching basics, sketch tools and constraints, and assemblies and mates, plus a short section on designing a part to be 3D printed. Multiple choice questions are graded automatically; short answer questions are reviewed by your instructor.',
+  totalPoints: 60,
+  passingScore: 48,
+  timeLimitMinutes: 55,
   sections: [
     {
       id: 'sketching-basics',
@@ -407,139 +407,6 @@ export const v5Unit1Test: Assessment = {
           prompt: 'You are building a four-bar lift in an assembly. State which mate you would use at each of the four pivots and which mate for the screwed structural joints, and explain both choices using degrees of freedom. Then describe how you would confirm the assembly is mated correctly.',
           points: 5,
           modelAnswer: 'Revolute at each of the four pivots, because each linkage joint rotates about a single axis and Revolute leaves exactly one rotational degree of freedom. Fastened for the screwed structural joints, because they must be rigid and Fastened removes all six degrees of freedom. To confirm, drag the linkage in the assembly: it should swing the way the real four-bar would and nothing else should move. Full credit also for mentioning fixing one part first as the anchor.',
-        },
-      ],
-    },
-    {
-      id: 'engineering-drawings',
-      title: 'Lesson 4 — Engineering Drawings',
-      description: 'Views, section and detail views, dimensioning rules, notes, title block and BOM, and exporting.',
-      questions: [
-        mc(
-          '4-1',
-          'What is an engineering drawing for?',
-          ['Making the 3D model look nicer on screen', 'Giving someone the exact sizes and notes they need to build the part', 'Storing a backup copy of the model', 'Replacing the assembly'],
-          1,
-          'The model is the idea; the drawing is the instructions. It is what you hand to whoever actually cuts or machines the part.'
-        ),
-        mc(
-          '4-2',
-          'What keeps an Onshape drawing correct when you change the 3D part?',
-          ['You redraw the affected views by hand', 'The drawing stays linked to the model and updates automatically', 'You export a new PDF and edit the numbers in it', 'Nothing; drawings and models are separate files'],
-          1,
-          'Onshape drawings stay linked to the model, so changing the part updates the views and dimensions.'
-        ),
-        mc(
-          '4-3',
-          'A dimension on your drawing is wrong because you changed a hole size on the 3D part. What is the correct fix?',
-          ['Double-click the dimension text and type the correct number', 'Edit the 3D part, and the linked drawing view updates itself', 'Delete the drawing and start a new one', 'Leave it, because drawings do not need to match the model'],
-          1,
-          'Let the model drive the drawing. A hand-edited number lies the moment the model changes.'
-        ),
-        mc(
-          '4-4',
-          'What does choosing a drawing template set up for you?',
-          ['The sheet size, the title block, and the units', 'The material the part is made from', 'Which views appear on the sheet', 'The scale the part will be printed at'],
-          0,
-          'A template sets the sheet size, title block, and units before you place a single view. ANSI templates are the ones set up in inches.'
-        ),
-        mc(
-          '4-5',
-          'Which set of views describes most parts, with nothing repeated?',
-          ['Front, Top, Right, and Isometric', 'Front, Back, Left, and Right', 'Top, Bottom, Section, and Detail', 'Isometric only'],
-          0,
-          'Front, Top, Right, and Isometric. Start with Front, project Top and Right, and put an Isometric in a corner.'
-        ),
-        mc(
-          '4-6',
-          'For a simple flat plate with one hole, why are Front, Top, and an Isometric enough?',
-          ['Onshape allows only three views per sheet', 'One view leaves the thickness ambiguous, while Back, Bottom, and Left would just repeat what Front, Top, and Right already show', 'An Isometric view always replaces the Front view', 'Plates never need dimensions, only views'],
-          1,
-          'One view is not enough and five is clutter. Show the outline, the thickness, and the overall shape, each exactly once.'
-        ),
-        mc(
-          '4-7',
-          'A part has a bore hidden deep inside it that you need to dimension. Which view?',
-          ['Detail view, because it enlarges the outside of the part', 'Section view, because it slices the part open along a cutting line', 'Isometric view', 'A second Front view'],
-          1,
-          'A Section view cuts the part open and hatches the cut face so you can see and dimension internal features such as bores and pockets.'
-        ),
-        mc(
-          '4-8',
-          'A chamfer on your part is too small to read on the drawing. Which view fixes that?',
-          ['Section view', 'Detail view', 'Top view', 'Auxiliary view'],
-          1,
-          'A Detail view draws a small region at a larger scale. You circle the region on a parent view and Onshape creates an enlarged, labelled copy.'
-        ),
-        mc(
-          '4-9',
-          'A drawing tags the same hole twice, once as 0.25 in and once as 0.20 in. What is this called and why is it a problem?',
-          ['Under-dimensioned; the maker has to guess the size', 'Over-dimensioned; the maker cannot tell which number to trust', 'Correctly dimensioned; two views need two numbers', 'A scale error; the numbers are both right at different scales'],
-          1,
-          'Over-dimensioned means a feature is dimensioned more than once, producing two values that disagree. The maker cannot tell which to trust, so the part comes out wrong.'
-        ),
-        mc(
-          '4-10',
-          'What is the rule that prevents both over- and under-dimensioning?',
-          ['Dimension each feature exactly once', 'Always use at least five views', 'Dimension only the largest features', 'Put every dimension inside the part outline'],
-          0,
-          'Dimension each feature exactly once: every size the maker needs appears, and no size appears twice.'
-        ),
-        mc(
-          '4-11',
-          'What information belongs in the title block?',
-          ['Part name, scale, units, and material', 'Designer name, date, revision, and colour', 'Quantity, cost, supplier, and weight', 'Front, Top, Right, and Isometric'],
-          0,
-          'The title block is the boxed table in the sheet corner. Always fill in at least part name, scale, units, and material.'
-        ),
-        mc(
-          '4-12',
-          'What is a BOM on an assembly drawing?',
-          ['A note describing the material', 'A parts list with one row per part: item number, quantity, name, and part number', 'A type of section view', 'The border around the sheet'],
-          1,
-          'A Bill of Materials lists every part in the assembly and updates automatically when you add or remove parts.'
-        ),
-        mc(
-          '4-13',
-          'On an assembly drawing, why must each callout (balloon) match a row in the BOM?',
-          ['Balloons set the scale of the drawing', 'So every part in the picture maps to exactly one line in the parts list', 'Because the BOM cannot update on its own', 'To replace the dimensions on the assembly'],
-          1,
-          'A callout carries a part’s item number from the BOM, so the picture and the table agree.'
-        ),
-        mc(
-          '4-14',
-          'You are handing a drawing to a sponsor’s shop to print and cut. Which export, and what do you check first?',
-          ['DXF, and check the BOM lists every part', 'PDF, and check the scale label in the title block', 'DWG, and check the Isometric view is in a corner', 'Any format works and nothing needs checking'],
-          1,
-          'Export a PDF for printing and sharing, and check the scale label first. A PDF printed at the wrong scale measures wrong on paper.'
-        ),
-        mc(
-          '4-15',
-          'Which export format would you use to bring the drawing into other CAD or CAM software, such as for a CNC router’s toolpaths?',
-          ['PDF', 'DWG or DXF', 'PNG', 'STL'],
-          1,
-          'DWG or DXF carry the drawing into other CAD or CAM software. PDF is for sharing and printing.'
-        ),
-        mc(
-          '4-16',
-          'Which of these belongs in a Note rather than as a dimension?',
-          ['The diameter of a hole', 'The material and the projection standard', 'The distance between two holes', 'The overall length of the plate'],
-          1,
-          'Notes carry what a size cannot: material, finish, projection standard, or an instruction such as "BREAK ALL SHARP EDGES".'
-        ),
-        {
-          kind: 'short-answer',
-          id: '4-17',
-          prompt: 'A drawing is only finished when a person who has never seen your 3D model could build the part from it. Using that standard, list four things you would check on a drawing before handing it over, and explain why each one matters.',
-          points: 4,
-          modelAnswer: 'Any four of: every feature dimensioned exactly once, with nothing missing or duplicated, so the maker never has to guess or choose between two numbers; only the views needed are shown, usually three or four, so nothing is ambiguous and nothing is clutter; dimensions placed in clear space around the views rather than on the part, so they stay readable; units and material stated in the title block, so the part is made from the right stock at the right size; centrelines and centremarks on every hole and round feature; the scale label checked before printing.',
-        },
-        {
-          kind: 'short-answer',
-          id: '4-18',
-          prompt: 'You need to document a part that has a hidden internal pocket and one very small fillet. Name the two special views you would add, say what each one does, and explain why the standard Front, Top, and Right views are not enough on their own.',
-          points: 3,
-          modelAnswer: 'A Section view slices the part open along a cutting line and hatches the cut face, revealing the internal pocket so it can be seen and dimensioned. A Detail view draws a small region at a larger scale so the small fillet is readable. The standard views only show the outside of the part at one scale, so a hidden pocket does not appear and a tiny fillet is too small to read.',
         },
       ],
     },
