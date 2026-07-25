@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Topbar } from '@/components/layout/topbar';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   assessmentAutoGradedPoints,
@@ -63,13 +64,12 @@ export default function AssessmentsIndexPage() {
                     </div>
 
                     <div className="flex items-center gap-4">
-                      <Link
-                        href={`/assessments/${test.slug}`}
-                        className="inline-flex items-center gap-1.5 rounded-md bg-accent px-3.5 py-2 text-[13px] font-semibold text-accent-foreground transition-opacity hover:opacity-[.88] active:scale-[.97]"
-                      >
-                        Start {test.unitLabel} test
-                        <ArrowRight size={14} />
-                      </Link>
+                      <Button asChild>
+                        <Link href={`/assessments/${test.slug}`}>
+                          Start {test.unitLabel} test
+                          <ArrowRight size={14} className="ml-1.5" />
+                        </Link>
+                      </Button>
                       <Link
                         href={`/assessments/${test.slug}/results`}
                         className="text-[13px] font-semibold text-muted-foreground transition-colors hover:text-foreground"
