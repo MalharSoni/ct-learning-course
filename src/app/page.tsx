@@ -1,300 +1,119 @@
-import { Sidebar } from '@/components/layout/sidebar';
-import { Topbar } from '@/components/layout/topbar';
-import { ContentWrapper } from '@/components/layout/content-wrapper';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, BookOpen, Wrench, Target, GraduationCap, Trophy } from 'lucide-react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { learningCourse, projects } from '@/lib/curriculum-data';
+import QRCode from 'qrcode';
+import { assessmentQuestionCount, v5Assessments } from '@/lib/assessment-data';
 
-export default function HomePage() {
+/**
+ * The address students type in. Kept short on purpose: it gets read off a TV
+ * across a room and typed by hand. Change this if the site moves.
+ */
+const JOIN_URL = 'v5test.vercel.app';
+
+export const metadata: Metadata = {
+  title: 'V5 Foundation Test',
+  description: 'Cast this screen so the room can see where to go.',
+};
+
+/** "V5 Foundation — Unit 1 Test: Onshape CAD" -> "Onshape CAD" */
+function shortName(title: string) {
+  return title.split(':').pop()?.trim() ?? title;
+}
+
+export default async function CastScreenPage() {
+  // Dark-on-white keeps the code scannable on older phone cameras.
+  const qrSvg = await QRCode.toString(`https://${JOIN_URL}`, {
+    type: 'svg',
+    margin: 0,
+    errorCorrectionLevel: 'M',
+    color: { dark: '#0A0A0A', light: '#FFFFFF' },
+  });
+
   return (
-    <>
-      <Sidebar />
-      <Topbar title="Caution Tape Robotics - Learning Course" />
-      <ContentWrapper>
-        <div className="space-y-24">
-          {/* Hero Section - Supabase Style */}
-          <div className="relative -mt-8 -mx-8 px-8 pt-16 pb-20 overflow-hidden">
-            {/* Gradient Background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-background to-background" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(62,207,142,0.1),transparent_50%)]" />
-            <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:50px_50px]" />
+    <main
+      className="relative flex min-h-dvh w-full flex-col bg-[#0A0A0A] text-white select-none md:h-dvh md:overflow-hidden"
+      style={{ colorScheme: 'dark' }}
+    >
+      {/* Soft green wash so a big black field does not read as a dead screen. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(120% 90% at 12% 0%, rgba(62,207,142,0.14), transparent 60%), radial-gradient(90% 80% at 100% 100%, rgba(62,207,142,0.07), transparent 65%)',
+        }}
+      />
 
-            <div className="relative space-y-8 text-center max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <div className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-1.5 text-sm font-semibold text-accent border border-accent/20">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
-                </span>
-                VEX V5 Robotics & STEM Education
-              </div>
-
-              <h1 className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter leading-[1.05]">
-                Build Your Future with{' '}
-                <span className="bg-gradient-to-r from-accent via-accent to-accent/70 bg-clip-text text-transparent">
-                  Robotics
-                </span>
-              </h1>
-
-              <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-                A comprehensive STEM learning platform for high school students. Master VEX V5 robotics,
-                CAD design, programming, and build portfolio projects that matter.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                <Button
-                  asChild
-                  size="lg"
-                  className="font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 text-base px-8"
-                >
-                  <Link href="/course/getting-started">
-                    Start Learning
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  asChild
-                  size="lg"
-                  className="font-semibold transition-all duration-200 hover:scale-105 active:scale-95 text-base px-8"
-                >
-                  <Link href="/projects">
-                    Explore Projects
-                    <Wrench className="ml-2 h-5 w-5" />
-                  </Link>
-                </Button>
-              </div>
-            </div>
+      {/* Header */}
+      <header className="relative flex shrink-0 items-center justify-between px-[4vw] pt-[3.2vh]">
+        <div className="flex items-center gap-[1vw]">
+          <div className="flex aspect-square w-[clamp(2rem,3vw,3.5rem)] items-center justify-center rounded-[0.35em] bg-[#3ECF8E] font-black text-[clamp(0.85rem,1.25vw,1.5rem)] text-[#0A0A0A]">
+            CT
           </div>
-
-          {/* Key Features */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150">
-            <Card className="border-t-[3px] border-t-blue-500 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
-              <CardHeader className="space-y-3">
-                <div className="h-12 w-12 rounded-xl bg-blue-500/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <BookOpen className="h-6 w-6 text-blue-500" />
-                </div>
-                <CardTitle className="text-[17px] font-bold">Structured Learning</CardTitle>
-                <CardDescription className="text-[14px] leading-relaxed">
-                  Progressive curriculum from safety basics to advanced competition-level techniques
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="border-t-[3px] border-t-green-500 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group md:delay-75">
-              <CardHeader className="space-y-3">
-                <div className="h-12 w-12 rounded-xl bg-green-500/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <Wrench className="h-6 w-6 text-green-500" />
-                </div>
-                <CardTitle className="text-[17px] font-bold">Hands-On Projects</CardTitle>
-                <CardDescription className="text-[14px] leading-relaxed">
-                  Real-world STEM projects including BattleBots, robotic arms, and IoT systems
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="border-t-[3px] border-t-amber-500 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group md:delay-150">
-              <CardHeader className="space-y-3">
-                <div className="h-12 w-12 rounded-xl bg-amber-500/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <GraduationCap className="h-6 w-6 text-amber-500" />
-                </div>
-                <CardTitle className="text-[17px] font-bold">Portfolio Building</CardTitle>
-                <CardDescription className="text-[14px] leading-relaxed">
-                  Document and showcase your projects for college applications and career opportunities
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </div>
-
-          {/* Learning Path */}
-          <div className="space-y-7 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Target className="h-5 w-5 text-primary" />
-              </div>
-              <h2 className="text-[28px] font-black tracking-tight">Learning Path</h2>
-            </div>
-
-            <div className="space-y-4">
-              {learningCourse.slice(0, 4).map((category, index) => (
-                <Card
-                  key={category.id}
-                  className="hover:shadow-md transition-all duration-300 hover:border-accent/50 group"
-                >
-                  <CardHeader>
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="space-y-3 flex-1">
-                        <div className="flex items-center gap-3">
-                          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-accent-foreground font-black text-sm shadow-sm group-hover:scale-110 transition-transform duration-300">
-                            {index + 1}
-                          </span>
-                          <CardTitle className="text-[19px] font-bold">{category.title}</CardTitle>
-                        </div>
-                        <CardDescription className="text-[14px] ml-12 leading-relaxed">
-                          {category.description}
-                        </CardDescription>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        asChild
-                        className="hover:bg-accent hover:text-accent-foreground transition-all duration-200 hover:scale-105 active:scale-95"
-                      >
-                        <Link href={`/course/${category.slug}`}>
-                          Start
-                          <ArrowRight className="ml-2 h-4 w-4" />
-                        </Link>
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="ml-12 flex flex-wrap gap-2">
-                      {category.sections.slice(0, 3).map((section) => (
-                        <span
-                          key={section.id}
-                          className="inline-flex items-center rounded-lg bg-muted px-3 py-1.5 text-[11.5px] font-semibold text-muted-foreground hover:bg-muted-foreground/10 transition-colors"
-                        >
-                          {section.title}
-                        </span>
-                      ))}
-                      {category.sections.length > 3 && (
-                        <span className="inline-flex items-center rounded-lg bg-muted px-3 py-1.5 text-[11.5px] font-semibold text-muted-foreground">
-                          +{category.sections.length - 3} more
-                        </span>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            <Button
-              asChild
-              className="w-full sm:w-auto font-semibold shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 active:scale-95"
-              size="lg"
-            >
-              <Link href="/course/getting-started">
-                Begin Learning Journey
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-
-          {/* Featured Projects */}
-          <div className="space-y-7 animate-in fade-in slide-in-from-bottom-10 duration-700 delay-500">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Wrench className="h-5 w-5 text-primary" />
-              </div>
-              <h2 className="text-[28px] font-black tracking-tight">Featured Projects</h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {projects.slice(0, 4).map((project, idx) => (
-                <Card
-                  key={project.id}
-                  className="flex flex-col hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
-                  style={{ animationDelay: `${idx * 75}ms` }}
-                >
-                  <CardHeader className="space-y-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <CardTitle className="text-[17px] font-bold group-hover:text-accent transition-colors">
-                        {project.title}
-                      </CardTitle>
-                      <span
-                        className={`inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wide shrink-0 ${
-                          project.difficulty === 'beginner'
-                            ? 'bg-green-100 dark:bg-green-950/30 text-green-800 dark:text-green-400'
-                            : project.difficulty === 'intermediate'
-                            ? 'bg-amber-100 dark:bg-amber-950/30 text-amber-800 dark:text-amber-400'
-                            : 'bg-red-100 dark:bg-red-950/30 text-red-800 dark:text-red-400'
-                        }`}
-                      >
-                        {project.difficulty}
-                      </span>
-                    </div>
-                    <CardDescription className="text-[14px] leading-relaxed">
-                      {project.description}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="mt-auto">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-[13px] text-muted-foreground font-medium flex items-center gap-1.5">
-                        <span className="text-accent">⏱️</span> {project.estimatedTime}
-                      </span>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        asChild
-                        className="hover:bg-accent hover:text-accent-foreground transition-all duration-200 hover:scale-105 active:scale-95"
-                      >
-                        <Link href={`/projects/${project.slug}`}>
-                          View Project
-                          <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-                        </Link>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            <Button
-              variant="outline"
-              asChild
-              className="w-full sm:w-auto font-semibold hover:bg-accent hover:text-accent-foreground transition-all duration-200 hover:scale-105 active:scale-95"
-              size="lg"
-            >
-              <Link href="/projects">
-                View All Projects
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-
-          {/* Getting Started */}
-          <Card className="bg-gradient-to-br from-accent via-accent to-accent/90 text-accent-foreground border-accent shadow-xl animate-in fade-in slide-in-from-bottom-12 duration-700 delay-700 overflow-hidden relative">
-            <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:20px_20px]" />
-            <CardHeader className="relative space-y-3">
-              <CardTitle className="text-[24px] font-black tracking-tight">
-                Ready to Start Building?
-              </CardTitle>
-              <CardDescription className="text-accent-foreground/90 text-[15px] leading-relaxed font-medium">
-                Whether you&apos;re a complete beginner or have some robotics experience, our curriculum
-                adapts to your skill level. Start with the fundamentals or jump into a project that
-                excites you.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="relative">
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  variant="secondary"
-                  asChild
-                  size="lg"
-                  className="font-semibold shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 active:scale-95"
-                >
-                  <Link href="/course/getting-started/intro-to-stem/what-is-stem">
-                    Start from the Beginning
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="border-accent-foreground/20 text-accent-foreground hover:bg-accent-foreground/10 font-semibold transition-all duration-200 hover:scale-105 active:scale-95"
-                  asChild
-                >
-                  <Link href="/projects/battlebots">
-                    Jump to BattleBots Project
-                    <Trophy className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <span className="text-[clamp(0.8rem,1.35vw,1.6rem)] font-bold tracking-tight text-white/90">
+            V5 Foundation Program
+          </span>
         </div>
-      </ContentWrapper>
-    </>
+        <span className="text-[clamp(0.6rem,0.95vw,1.15rem)] font-bold uppercase tracking-[0.22em] text-white/35">
+          Unit Test
+        </span>
+      </header>
+
+      {/* Hero: the address and the QR sit on one line, biggest thing on screen. */}
+      <section className="relative flex items-center px-[4vw] py-[6vh] md:flex-1 md:py-0">
+        <div className="flex w-full flex-col items-start gap-[4vh] md:flex-row md:items-center md:gap-[4vw]">
+          <div className="min-w-0 flex-1">
+            <p className="text-[clamp(0.95rem,1.7vw,2.1rem)] font-medium text-white/45">
+              Go to
+            </p>
+            <p className="mt-[0.15em] text-[clamp(1.9rem,10vw,3rem)] font-black leading-[1.02] tracking-[-0.035em] text-[#3ECF8E] md:whitespace-nowrap md:text-[clamp(2rem,7.4vw,8.25rem)]">
+              {JOIN_URL}
+            </p>
+            <p className="mt-[0.6em] text-[clamp(0.9rem,1.5vw,1.9rem)] font-medium text-white/55">
+              On your laptop or phone
+            </p>
+          </div>
+
+          {/* Pointless on the phone that is already here, so cast screens only. */}
+          <div className="hidden shrink-0 flex-col items-center gap-[1.2vh] md:flex">
+            <div className="w-[clamp(8rem,17.5vw,20rem)] rounded-[0.6rem] bg-white p-[0.85vw]">
+              <div
+                className="[&>svg]:block [&>svg]:h-auto [&>svg]:w-full"
+                dangerouslySetInnerHTML={{ __html: qrSvg }}
+              />
+            </div>
+            <span className="text-[clamp(0.6rem,0.95vw,1.15rem)] font-semibold uppercase tracking-[0.18em] text-white/40">
+              Or scan
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* Which unit to open once they are on the site. */}
+      <section className="relative shrink-0 px-[4vw] pb-[3.5vh]">
+        <p className="mb-[1.4vh] text-[clamp(0.75rem,1.2vw,1.45rem)] font-semibold text-white/45">
+          Then pick the unit your instructor assigned
+        </p>
+        <div className="flex flex-col gap-[1.6vh] md:flex-row md:gap-[1.6vw]">
+          {v5Assessments.map((test) => (
+            <Link
+              key={test.id}
+              href={`/assessments/${test.slug}`}
+              className="flex-1 rounded-[0.75rem] border border-white/[0.12] bg-white/[0.045] px-[5vw] py-[2.4vh] transition-colors hover:border-[#3ECF8E]/50 hover:bg-white/[0.08] md:px-[2vw] md:py-[2.8vh]"
+            >
+              <span className="block text-[clamp(0.62rem,0.95vw,1.15rem)] font-bold uppercase tracking-[0.2em] text-[#3ECF8E]">
+                {test.unitLabel}
+              </span>
+              <span className="mt-[0.25em] block truncate text-[clamp(1rem,2.1vw,2.6rem)] font-extrabold tracking-tight text-white">
+                {shortName(test.title)}
+              </span>
+              <span className="mt-[0.35em] block text-[clamp(0.7rem,1.1vw,1.35rem)] font-medium text-white/45">
+                {assessmentQuestionCount(test)} questions · {test.timeLimitMinutes} minutes ·{' '}
+                {test.totalPoints} points
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+    </main>
   );
 }
